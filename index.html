@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+
+<html lang="fi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Työnjohtajan Työkalu</title>
+<meta name="description" content="Rakennusalan työnjohtajan työkalu — aikataulut, tarkistuslistat, muistiinpanot">
+<meta name="theme-color" content="#0d0f18">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Työnjohtaja">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
+:root {
+  --bg:#0d0f18; --surface:#141824; --surface2:#1a1f2e; --surface3:#1f2638;
+  --border:#252d42; --accent:#f5a623; --accent2:#4ecdc4; --accent3:#e74c6f; --accent4:#7c3aed;
+  --text:#e8eaf0; --text2:#8b92a8; --text3:#444e68;
+  --hh:56px; --sbw:300px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
+
+/* ── HEADER ── */
+header{background:var(–surface);border-bottom:1px solid var(–border);padding:0 14px;display:flex;align-items:center;height:var(–hh);position:sticky;top:0;z-index:200;gap:10px}
+.logo{font-size:15px;font-weight:800;color:var(–accent);white-space:nowrap;letter-spacing:-.3px}
+.logo span{color:var(–text3);font-weight:400;font-size:12px}
+
+/* site switcher */
+.site-switcher{display:flex;align-items:center;gap:6px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+.site-switcher::-webkit-scrollbar{display:none}
+.site-pill{
+padding:5px 12px;border-radius:20px;border:1.5px solid var(–border);
+background:transparent;color:var(–text2);font-family:‘Syne’,sans-serif;
+font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;
+transition:all .15s;touch-action:manipulation;
+}
+.site-pill:hover{border-color:var(–accent);color:var(–accent)}
+.site-pill.active{background:var(–accent);color:#000;border-color:var(–accent)}
+.site-pill.add-site{border-style:dashed;color:var(–text3)}
+.site-pill.add-site:hover{border-color:var(–accent2);color:var(–accent2)}
+
+.header-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.btn{padding:6px 12px;border-radius:6px;border:none;cursor:pointer;font-family:‘Syne’,sans-serif;font-size:11px;font-weight:700;transition:all .15s;white-space:nowrap;touch-action:manipulation}
+.btn-primary{background:var(–accent);color:#000}
+.btn-primary:hover{background:#ffba45}
+.btn-ghost{background:transparent;color:var(–text2);border:1px solid var(–border)}
+.btn-ghost:hover{border-color:var(–accent);color:var(–accent)}
+.btn-danger{background:transparent;color:var(–accent3);border:1px solid var(–accent3)}
+.btn-danger:hover{background:var(–accent3);color:#fff}
+.btn-teal{background:transparent;color:var(–accent2);border:1px solid var(–accent2)}
+.btn-teal:hover{background:var(–accent2);color:#000}
+.btn-sm{padding:4px 8px;font-size:10px}
+.btn-lbl{display:inline}
+
+/* ── TABS (below header) ── */
+.view-tabs{display:flex;background:var(–surface);border-bottom:1px solid var(–border)}
+.vtab{flex:1;padding:9px 6px;text-align:center;font-size:11px;font-weight:700;color:var(–text3);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;transition:all .15s;font-family:‘Syne’,sans-serif;touch-action:manipulation}
+.vtab.active{color:var(–accent);border-bottom-color:var(–accent)}
+.vtab .tab-icon{font-size:14px;display:block;margin-bottom:1px}
+
+/* ── LAYOUT ── */
+.app{display:flex;height:calc(100vh - var(–hh) - 42px)}
+.view-panel{display:none;flex:1;overflow:hidden;flex-direction:column}
+.view-panel.active{display:flex}
+
+/* ── GANTT VIEW ── */
+.gantt-topbar{padding:8px 14px;background:var(–surface);border-bottom:1px solid var(–border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0}
+.gantt-topbar label{font-size:10px;color:var(–text2);font-weight:700;white-space:nowrap}
+.site-name-display{font-size:14px;font-weight:800;color:var(–text);min-width:60px}
+.nav-weeks{display:flex;align-items:center;gap:3px;margin-left:auto}
+.week-display{font-size:10px;font-family:‘DM Mono’,monospace;color:var(–text2);min-width:110px;text-align:center}
+.zoom-toggle{display:flex;gap:2px;background:var(–bg);border-radius:6px;padding:2px}
+.zoom-btn{padding:3px 8px;border-radius:4px;border:none;background:transparent;color:var(–text2);font-size:10px;font-weight:700;cursor:pointer;font-family:‘Syne’,sans-serif;transition:all .15s}
+.zoom-btn.active{background:var(–accent);color:#000}
+.gnr{width:30px;min-width:30px;padding:0 4px;border-right:1px solid var(–border);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:‘DM Mono’,monospace;color:var(–text3);flex-shrink:0}
+.gnr-h{width:30px;min-width:30px;padding:7px 4px;border-right:1px solid var(–border);font-size:8px;font-weight:700;color:var(–text3);letter-spacing:.05em;text-transform:uppercase;text-align:center;background:var(–bg)}
+.gkesto{width:42px;min-width:42px;padding:0 4px;border-right:1px solid var(–border);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:‘DM Mono’,monospace;color:var(–text2);flex-shrink:0}
+.gkesto-h{width:42px;min-width:42px;padding:7px 4px;border-right:1px solid var(–border);font-size:8px;font-weight:700;color:var(–text3);letter-spacing:.05em;text-transform:uppercase;text-align:center;background:var(–bg)}
+
+.stats-row{display:flex;gap:12px;padding:7px 14px;background:var(–surface2);border-bottom:1px solid var(–border);overflow-x:auto;flex-shrink:0}
+.stats-row::-webkit-scrollbar{display:none}
+.stat{font-size:10px;color:var(–text2);font-family:‘DM Mono’,monospace;white-space:nowrap}
+.stat strong{color:var(–accent);font-size:12px}
+.stat-warn strong{color:var(–accent3)}
+.stat-ok strong{color:var(–accent2)}
+
+.gantt-wrapper{flex:1;overflow:auto;-webkit-overflow-scrolling:touch}
+.gantt-wrapper::-webkit-scrollbar{height:5px;width:5px}
+.gantt-wrapper::-webkit-scrollbar-thumb{background:var(–border);border-radius:3px}
+.gantt-container{min-width:100%}
+
+.gantt-header{display:flex;position:sticky;top:0;z-index:10;background:var(–bg);border-bottom:2px solid var(–border)}
+.glh{width:175px;min-width:175px;padding:7px 10px;font-size:9px;font-weight:700;color:var(–text3);letter-spacing:.08em;text-transform:uppercase;border-right:1px solid var(–border);background:var(–bg)}
+.gcols-h{display:flex}
+.wch{border-right:1px solid var(–border);text-align:center;font-size:9px;font-family:‘DM Mono’,monospace;color:var(–text3);padding:7px 0;flex-shrink:0}
+.wch.tw{color:var(–accent);font-weight:700}
+
+.gantt-row{display:flex;border-bottom:1px solid var(–border);min-height:48px}
+.grl{width:175px;min-width:175px;padding:6px 10px;border-right:1px solid var(–border);display:flex;flex-direction:column;justify-content:center;cursor:pointer}
+.grl:hover .rn{color:var(–accent)}
+.rn{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs{font-size:9px;color:var(–text2);font-family:‘DM Mono’,monospace;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcols{display:flex;flex:1;position:relative;align-items:center}
+.gc{border-right:1px solid var(–border);height:100%;flex-shrink:0}
+.gc.tw{background:rgba(245,166,35,.04)}
+.gbar{position:absolute;height:24px;top:50%;transform:translateY(-50%);border-radius:4px;display:flex;align-items:center;padding:0 6px;font-size:9px;font-weight:700;white-space:nowrap;overflow:hidden;cursor:pointer;z-index:2}
+.today-line{position:absolute;top:0;bottom:0;width:2px;background:var(–accent);z-index:5;pointer-events:none}
+.today-line::after{content:‘NYT’;position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:7px;font-weight:700;font-family:‘DM Mono’,monospace;color:var(–accent);white-space:nowrap;letter-spacing:.1em}
+.overdue-row .rn{color:var(–accent3) !important}
+.legend{display:flex;gap:8px;padding:7px 14px;background:var(–surface);border-top:1px solid var(–border);flex-wrap:wrap;flex-shrink:0}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:9px;color:var(–text2);font-family:‘DM Mono’,monospace}
+.ldot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+
+/* ── TASK LIST VIEW ── */
+.list-view{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
+.list-view::-webkit-scrollbar{width:4px}
+.list-view::-webkit-scrollbar-thumb{background:var(–border);border-radius:2px}
+.task-card{background:var(–surface2);border:1px solid var(–border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;border-left:3px solid transparent;transition:border-color .15s}
+.task-card:hover{border-color:var(–accent)}
+.tc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px}
+.tc-name{font-size:13px;font-weight:800}
+.tc-dates{font-size:10px;font-family:‘DM Mono’,monospace;color:var(–text2);white-space:nowrap}
+.tc-meta{font-size:11px;color:var(–text2);margin-bottom:5px}
+.tc-tags{display:flex;gap:4px;flex-wrap:wrap}
+.tag{padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;font-family:‘DM Mono’,monospace}
+.pb{background:var(–border);height:3px;border-radius:2px;margin-top:6px;overflow:hidden}
+.pbf{height:100%;border-radius:2px;transition:width .3s}
+
+/* ── CHECKLIST VIEW ── */
+.checklist-wrap{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
+.check-section{margin-bottom:16px}
+.check-section-title{font-size:11px;font-weight:800;color:var(–text2);text-transform:uppercase;letter-spacing:.07em;padding:8px 12px;background:var(–surface2);border-radius:6px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.check-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(–surface);border:1px solid var(–border);border-radius:8px;margin-bottom:4px;cursor:pointer;transition:all .15s}
+.check-item:hover{border-color:var(–border)}
+.check-item.done{opacity:.5}
+.check-item.done .ci-text{text-decoration:line-through;color:var(–text3)}
+.check-box{width:20px;height:20px;border-radius:5px;border:2px solid var(–border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.check-item.done .check-box{background:var(–accent2);border-color:var(–accent2)}
+.ci-text{font-size:12px;font-weight:600;flex:1}
+.ci-meta{font-size:10px;color:var(–text2);font-family:‘DM Mono’,monospace}
+.add-check-row{display:flex;gap:8px;padding:8px 0}
+
+/* ── NOTES VIEW ── */
+.notes-wrap{flex:1;display:flex;flex-direction:column;padding:12px;gap:10px;overflow-y:auto}
+.note-card{background:var(–surface2);border:1px solid var(–border);border-radius:10px;padding:12px;cursor:pointer;transition:border-color .15s;position:relative}
+.note-card:hover{border-color:var(–accent)}
+.note-card-title{font-size:13px;font-weight:800;margin-bottom:4px}
+.note-card-body{font-size:11px;color:var(–text2);line-height:1.5;white-space:pre-wrap;max-height:80px;overflow:hidden}
+.note-card-meta{font-size:9px;color:var(–text3);font-family:‘DM Mono’,monospace;margin-top:6px}
+.note-card-site{position:absolute;top:10px;right:10px;font-size:9px;padding:2px 6px;border-radius:3px;font-family:‘DM Mono’,monospace;font-weight:700}
+
+/* ── DASHBOARD VIEW ── */
+.dash-wrap{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.dash-card{background:var(–surface2);border:1px solid var(–border);border-radius:10px;padding:14px}
+.dash-card-title{font-size:10px;font-weight:700;color:var(–text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
+.dash-stat{font-size:28px;font-weight:800;color:var(–accent)}
+.dash-stat-sub{font-size:10px;color:var(–text2);margin-top:2px}
+.dash-site-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(–border)}
+.dash-site-row:last-child{border-bottom:none}
+.dash-site-name{font-size:12px;font-weight:700}
+.dash-site-meta{font-size:10px;color:var(–text2);font-family:‘DM Mono’,monospace}
+.mini-progress{background:var(–border);height:4px;border-radius:2px;margin-top:4px;overflow:hidden;width:100%}
+.mini-progress-fill{height:100%;border-radius:2px;background:var(–accent2)}
+.upcoming-item{padding:8px 0;border-bottom:1px solid var(–border);display:flex;gap:10px;align-items:flex-start}
+.upcoming-item:last-child{border-bottom:none}
+.upcoming-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.upcoming-text{font-size:11px;font-weight:700}
+.upcoming-meta{font-size:9px;color:var(–text2);font-family:‘DM Mono’,monospace}
+.overdue-badge{background:var(–accent3);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px;font-family:‘DM Mono’,monospace}
+
+/* ── MODALS ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);animation:fadeIn .15s}
+@media(min-width:600px){.modal-overlay{align-items:center}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{background:var(–surface);border:1px solid var(–border);border-radius:14px 14px 0 0;width:100%;max-width:520px;max-height:93vh;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:slideUp .2s}
+@media(min-width:600px){.modal{border-radius:12px;max-height:90vh}}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mh{padding:16px 18px 12px;border-bottom:1px solid var(–border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(–surface);z-index:1}
+.mh h3{font-size:15px;font-weight:800}
+.mclose{background:none;border:none;color:var(–text2);cursor:pointer;font-size:22px;line-height:1;padding:2px 6px;border-radius:4px}
+.mbody{padding:16px 18px}
+.mfoot{padding:12px 18px;border-top:1px solid var(–border);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(–surface)}
+.fg{margin-bottom:13px}
+.fl{display:block;font-size:10px;font-weight:700;color:var(–text2);margin-bottom:4px;letter-spacing:.05em;text-transform:uppercase}
+.fi,.fta{width:100%;background:var(–bg);border:1px solid var(–border);border-radius:6px;color:var(–text);padding:9px 11px;font-size:13px;font-family:‘Syne’,sans-serif;transition:border-color .15s;-webkit-appearance:none}
+.fi:focus,.fta:focus{outline:none;border-color:var(–accent)}
+.fta{resize:vertical;min-height:70px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.5);cursor:pointer}
+.cp-row{display:flex;gap:7px;flex-wrap:wrap}
+.cdot{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .1s,border-color .1s;touch-action:manipulation}
+.cdot.sel{border-color:#fff;transform:scale(1.1)}
+
+/* ── SITE MODAL ── */
+.site-list-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(–surface2);border:1px solid var(–border);border-radius:8px;margin-bottom:6px}
+.sli-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
+.sli-name{flex:1;font-size:13px;font-weight:700}
+.sli-meta{font-size:10px;color:var(–text2);font-family:‘DM Mono’,monospace}
+
+/* ── PDF LOADING ── */
+.pdf-loading{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:400;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(–text);font-family:‘DM Mono’,monospace;font-size:12px}
+.spinner{width:38px;height:38px;border:3px solid var(–border);border-top-color:var(–accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+.app{height:calc(100vh - var(–hh) - 42px)}
+.btn-lbl{display:none}
+.logo span{display:none}
+.glh,.grl{width:130px;min-width:130px}
+.week-display{min-width:80px;font-size:9px}
+.dash-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:420px){
+.site-pill{padding:4px 9px;font-size:10px}
+.nav-weeks .week-display{display:none}
+.dash-grid{grid-template-columns:1fr}
+}
+
+/* ── PDF TEMPLATE ── */
+#pdf-cap{background:#fff;color:#111;font-family:Arial,sans-serif;padding:22px;width:1100px}
+#pdf-cap .pt{font-size:20px;font-weight:800;margin-bottom:3px}
+#pdf-cap .pm{font-size:10px;color:#666;margin-bottom:12px}
+#pdf-cap .ps{display:flex;gap:18px;margin-bottom:14px;font-size:11px;color:#444}
+#pdf-cap .ps strong{color:#e08a00}
+#pdf-cap .psec{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#111;padding-bottom:3px;border-bottom:2px solid #f5a623;display:inline-block;margin:14px 0 7px}
+#pdf-cap table{width:100%;border-collapse:collapse;font-size:10px}
+#pdf-cap th{background:#1a1a2e;color:#fff;padding:6px 7px;text-align:left;font-size:9px;text-transform:uppercase;letter-spacing:.04em}
+#pdf-cap td{padding:5px 7px;border-bottom:1px solid #e5e7eb;color:#222;vertical-align:middle}
+#pdf-cap tr:nth-child(even) td{background:#f9fafb}
+#pdf-cap .pcdot{display:inline-block;width:7px;height:7px;border-radius:2px;margin-right:4px;vertical-align:middle}
+#pdf-cap .gw{overflow:hidden;border:1px solid #e5e7eb;border-radius:4px;margin:6px 0 16px}
+#pdf-cap .gh2{display:flex;background:#1a1a2e}
+#pdf-cap .ghl{width:180px;min-width:180px;padding:5px 7px;font-size:8px;font-weight:700;color:#fff;text-transform:uppercase;border-right:1px solid #333}
+#pdf-cap .gc2{display:flex}
+#pdf-cap .gwh2{text-align:center;font-size:7px;color:#aaa;padding:5px 0;border-right:1px solid #333;flex-shrink:0}
+#pdf-cap .gwht{color:#f5a623;font-weight:700}
+#pdf-cap .gr2{display:flex;border-bottom:1px solid #e5e7eb;height:24px}
+#pdf-cap .grl2{width:180px;min-width:180px;padding:0 7px;font-size:9px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;border-right:1px solid #e5e7eb;color:#111}
+#pdf-cap .gc3{flex:1;position:relative;display:flex}
+#pdf-cap .gwc2{border-right:1px solid #f0f0f0;height:100%;flex-shrink:0}
+#pdf-cap .gb{position:absolute;height:13px;top:50%;transform:translateY(-50%);border-radius:3px;font-size:8px;font-weight:700;display:flex;align-items:center;padding:0 4px;overflow:hidden}
+#pdf-cap .tvl{position:absolute;top:0;bottom:0;width:1px;background:#f5a623;z-index:5}
+</style>
+
+</head>
+<body>
+
+<!-- HEADER -->
+
+<header>
+  <div class="logo">TYÖNJOHTAJA <span>/ pro</span></div>
+  <div class="site-switcher" id="site-switcher"></div>
+  <div class="header-right">
+    <button class="btn btn-ghost btn-sm" onclick="openSiteModal()">⚙ <span class="btn-lbl">Työmaat</span></button>
+    <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ <span class="btn-lbl">CSV</span></button>
+    <button class="btn btn-ghost btn-sm" onclick="exportPDF()">📄 <span class="btn-lbl">PDF</span></button>
+    <button class="btn btn-primary" onclick="openAddTaskModal()">+ <span class="btn-lbl">Lisää</span></button>
+  </div>
+</header>
+
+<!-- VIEW TABS -->
+
+<div class="view-tabs">
+  <button class="vtab active" id="vtab-dash" onclick="switchView('dash')"><span class="tab-icon">📊</span>Katsaus</button>
+  <button class="vtab" id="vtab-gantt" onclick="switchView('gantt')"><span class="tab-icon">📅</span>Aikataulu</button>
+  <button class="vtab" id="vtab-list" onclick="switchView('list')"><span class="tab-icon">📋</span>Tehtävät</button>
+  <button class="vtab" id="vtab-check" onclick="switchView('check')"><span class="tab-icon">✅</span>Tarkistus</button>
+  <button class="vtab" id="vtab-notes" onclick="switchView('notes')"><span class="tab-icon">📝</span>Muistiinpanot</button>
+</div>
+
+<div class="app">
+
+  <!-- DASHBOARD -->
+
+  <div class="view-panel active" id="panel-dash">
+    <div class="dash-wrap" id="dash-wrap"></div>
+  </div>
+
+  <!-- GANTT -->
+
+  <div class="view-panel" id="panel-gantt">
+    <div class="gantt-topbar">
+      <div class="site-name-display" id="gantt-site-name"></div>
+      <div class="zoom-toggle">
+        <button class="zoom-btn active" id="zoom-week" onclick="setZoom('week')">Viikko</button>
+        <button class="zoom-btn" id="zoom-day" onclick="setZoom('day')">Päivä</button>
+      </div>
+      <div class="nav-weeks">
+        <button class="btn btn-ghost btn-sm" onclick="shiftPeriods(-4)">«</button>
+        <button class="btn btn-ghost btn-sm" onclick="shiftPeriods(-1)">‹</button>
+        <div class="week-display" id="week-display"></div>
+        <button class="btn btn-ghost btn-sm" onclick="shiftPeriods(1)">›</button>
+        <button class="btn btn-ghost btn-sm" onclick="shiftPeriods(4)">»</button>
+        <button class="btn btn-ghost btn-sm" onclick="jumpToToday()" style="color:var(--accent)" title="Tänään">●</button>
+      </div>
+    </div>
+    <div class="stats-row" id="stats-row"></div>
+    <div class="gantt-wrapper"><div class="gantt-container" id="gantt-container"></div></div>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <!-- TASK LIST -->
+
+  <div class="view-panel" id="panel-list">
+    <div style="padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-shrink:0">
+      <select id="list-filter-site" class="fi" style="flex:1;max-width:200px;padding:5px 8px;font-size:11px" onchange="renderListView()">
+        <option value="__all__">Kaikki työmaat</option>
+      </select>
+      <select id="list-filter-status" class="fi" style="max-width:160px;padding:5px 8px;font-size:11px" onchange="renderListView()">
+        <option value="all">Kaikki</option>
+        <option value="active">Käynnissä</option>
+        <option value="upcoming">Tulossa</option>
+        <option value="done">Valmiit</option>
+        <option value="overdue">Myöhässä</option>
+      </select>
+      <button class="btn btn-primary btn-sm" onclick="openAddTaskModal()">+ Uusi</button>
+    </div>
+    <div class="list-view" id="list-view"></div>
+  </div>
+
+  <!-- CHECKLIST -->
+
+  <div class="view-panel" id="panel-check">
+    <div style="padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-shrink:0">
+      <select id="check-filter-site" class="fi" style="flex:1;max-width:200px;padding:5px 8px;font-size:11px" onchange="renderCheckView()">
+        <option value="__all__">Kaikki työmaat</option>
+      </select>
+      <button class="btn btn-teal btn-sm" onclick="autoGenerateChecklist()">⚡ Peruslista</button>
+      <button class="btn btn-teal btn-sm" onclick="openAddCheckModal()">+ Uusi tarkistus</button>
+    </div>
+    <div class="checklist-wrap" id="checklist-wrap"></div>
+  </div>
+
+  <!-- NOTES -->
+
+  <div class="view-panel" id="panel-notes">
+    <div style="padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-shrink:0">
+      <select id="notes-filter-site" class="fi" style="flex:1;max-width:200px;padding:5px 8px;font-size:11px" onchange="renderNotesView()">
+        <option value="__all__">Kaikki työmaat</option>
+      </select>
+      <button class="btn btn-ghost btn-sm" onclick="openAddNoteModal()">+ Uusi muistiinpano</button>
+    </div>
+    <div class="notes-wrap" id="notes-wrap"></div>
+  </div>
+
+</div><!-- .app -->
+
+<!-- TASK MODAL -->
+
+<div class="modal-overlay" id="task-modal" style="display:none" onclick="if(event.target===this)closeTaskModal()">
+<div class="modal">
+  <div class="mh"><h3 id="task-modal-title">Lisää tehtävä</h3><button class="mclose" onclick="closeTaskModal()">×</button></div>
+  <div class="mbody">
+    <div class="fg">
+      <label class="fl">Työvaihe / Tehtävä *</label>
+      <input type="text" id="f-name" class="fi" placeholder="Työvaihe tai tehtävä">
+    </div>
+    <div class="fg">
+      <label class="fl">Työmaa</label>
+      <select id="f-site" class="fi"></select>
+    </div>
+    <div class="fg">
+      <label class="fl">Kuvaus</label>
+      <textarea id="f-desc" class="fta" placeholder="Lisätiedot, huomiot, erityisvaatimukset..."></textarea>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Vastuuhenkilö / Urakoitsija *</label><input type="text" id="f-resp" class="fi" placeholder="Vastuuhenkilö tai urakoitsija"></div>
+      <div class="fg"><label class="fl">Sijainti / Lohko</label><input type="text" id="f-loc" class="fi" placeholder="Lohko, kerros tai alue"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Henkilömäärä</label><input type="number" id="f-ppl" class="fi" placeholder="0" min="0"></div>
+      <div class="fg"><label class="fl">Kalusto</label><input type="text" id="f-equip" class="fi" placeholder="Tarvittava kalusto"></div>
+    </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Alkupäivä *</label><input type="date" id="f-start" class="fi"></div>
+      <div class="fg"><label class="fl">Loppupäivä *</label><input type="date" id="f-end" class="fi"></div>
+    </div>
+    <div class="fg">
+      <label class="fl">Edistyminen: <span id="pval">0</span>%</label>
+      <input type="range" id="f-prog" min="0" max="100" value="0" style="width:100%;accent-color:var(--accent2);height:22px">
+    </div>
+    <div class="fg">
+      <label class="fl">Prioriteetti</label>
+      <select id="f-prio" class="fi">
+        <option value="normal">Normaali</option>
+        <option value="high">Korkea 🔴</option>
+        <option value="low">Matala ⚪</option>
+      </select>
+    </div>
+    <div class="fg"><label class="fl">Väri</label><div class="cp-row" id="cp"></div></div>
+  </div>
+  <div class="mfoot">
+    <button class="btn btn-danger btn-sm" id="del-task-btn" style="display:none;margin-right:auto" onclick="deleteTask()">🗑 Poista</button>
+    <button class="btn btn-ghost" onclick="closeTaskModal()">Peruuta</button>
+    <button class="btn btn-primary" onclick="saveTask()">💾 Tallenna</button>
+  </div>
+</div>
+</div>
+
+<!-- SITE MODAL -->
+
+<div class="modal-overlay" id="site-modal" style="display:none" onclick="if(event.target===this)closeSiteModal()">
+<div class="modal">
+  <div class="mh"><h3>Työmaat</h3><button class="mclose" onclick="closeSiteModal()">×</button></div>
+  <div class="mbody">
+    <div id="site-list-el"></div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+      <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em">Lisää uusi työmaa</div>
+      <div class="frow" style="margin-bottom:10px">
+        <div class="fg" style="margin-bottom:0"><label class="fl">Nimi *</label><input type="text" id="ns-name" class="fi" placeholder="Työmaan nimi"></div>
+        <div class="fg" style="margin-bottom:0"><label class="fl">Osoite</label><input type="text" id="ns-addr" class="fi" placeholder="Osoite"></div>
+      </div>
+      <div class="frow" style="margin-bottom:10px">
+        <div class="fg" style="margin-bottom:0"><label class="fl">Työmaakoodi</label><input type="text" id="ns-code" class="fi" placeholder="Sisäinen projektinumero"></div>
+        <div class="fg" style="margin-bottom:0"><label class="fl">Väri</label><div class="cp-row" id="site-cp" style="margin-top:4px"></div></div>
+      </div>
+      <div class="frow" style="margin-bottom:10px">
+        <div class="fg" style="margin-bottom:0"><label class="fl">Päällikkö</label><input type="text" id="ns-mgr" class="fi" placeholder="Työmaan päällikkö"></div>
+        <div class="fg" style="margin-bottom:0"><label class="fl">Suunnittelija</label><input type="text" id="ns-designer" class="fi" placeholder="Suunnittelijan nimi"></div>
+      </div>
+      <div class="fg" style="margin-bottom:10px"><label class="fl">Yritys / Tilaaja</label><input type="text" id="ns-company" class="fi" placeholder="Yrityksen nimi"></div>
+      <button class="btn btn-primary" style="width:100%" onclick="addSite()">+ Lisää työmaa</button>
+    </div>
+  </div>
+  <div class="mfoot"><button class="btn btn-ghost" onclick="closeSiteModal()">Sulje</button></div>
+</div>
+</div>
+
+<!-- CHECKLIST MODAL -->
+
+<div class="modal-overlay" id="check-modal" style="display:none" onclick="if(event.target===this)closeCheckModal()">
+<div class="modal">
+  <div class="mh"><h3 id="check-modal-title">Lisää tarkistuskohde</h3><button class="mclose" onclick="closeCheckModal()">×</button></div>
+  <div class="mbody">
+    <div class="fg"><label class="fl">Tarkistuskohde *</label><input type="text" id="ci-text" class="fi" placeholder="Mitä tarkistetaan..."></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Työmaa</label><select id="ci-site" class="fi"></select></div>
+      <div class="fg"><label class="fl">Kategoria</label>
+        <select id="ci-cat" class="fi">
+          <option value="Turvallisuus">Turvallisuus 🦺</option>
+          <option value="Laatu">Laatu ✔</option>
+          <option value="Ympäristö">Ympäristö 🌱</option>
+          <option value="Dokumentointi">Dokumentointi 📄</option>
+          <option value="Muu">Muu</option>
+        </select>
+      </div>
+    </div>
+    <div class="fg"><label class="fl">Vastuu</label><input type="text" id="ci-resp" class="fi" placeholder="Vastuuhenkilö"></div>
+  </div>
+  <div class="mfoot">
+    <button class="btn btn-danger btn-sm" id="del-check-btn" style="display:none;margin-right:auto" onclick="deleteCheckItem()">🗑</button>
+    <button class="btn btn-ghost" onclick="closeCheckModal()">Peruuta</button>
+    <button class="btn btn-primary" onclick="saveCheckItem()">💾 Tallenna</button>
+  </div>
+</div>
+</div>
+
+<!-- NOTE MODAL -->
+
+<div class="modal-overlay" id="note-modal" style="display:none" onclick="if(event.target===this)closeNoteModal()">
+<div class="modal">
+  <div class="mh"><h3 id="note-modal-title">Muistiinpano</h3><button class="mclose" onclick="closeNoteModal()">×</button></div>
+  <div class="mbody">
+    <div class="fg"><label class="fl">Otsikko *</label><input type="text" id="ni-title" class="fi" placeholder="Muistiinpanon otsikko..."></div>
+    <div class="fg"><label class="fl">Työmaa</label><select id="ni-site" class="fi"></select></div>
+    <div class="fg"><label class="fl">Sisältö *</label><textarea id="ni-body" class="fta" style="min-height:130px" placeholder="Kirjoita muistiinpano..."></textarea></div>
+  </div>
+  <div class="mfoot">
+    <button class="btn btn-danger btn-sm" id="del-note-btn" style="display:none;margin-right:auto" onclick="deleteNote()">🗑 Poista</button>
+    <button class="btn btn-ghost" onclick="closeNoteModal()">Peruuta</button>
+    <button class="btn btn-primary" onclick="saveNote()">💾 Tallenna</button>
+  </div>
+</div>
+</div>
+
+<!-- PDF CAPTURE -->
+
+<div id="pdf-cap" style="position:fixed;left:-9999px;top:0;pointer-events:none;opacity:0"></div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────
+const COLORS=['#f5a623','#4ecdc4','#e74c6f','#45b7d1','#96e878','#c084fc','#fb923c','#38bdf8','#a3e635','#f472b6','#facc15','#34d399'];
+const SITE_COLORS=['#f5a623','#4ecdc4','#e74c6f','#7c3aed','#fb923c','#38bdf8'];
+
+function load(k,def){try{return JSON.parse(localStorage.getItem(k))||def}catch{return def}}
+function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
+
+let sites    = load('tj_sites', []);
+let tasks    = load('tj_tasks', []);
+let checks   = load('tj_checks', []);
+let notes    = load('tj_notes', []);
+let activeSiteId = load('tj_active_site', null);
+
+// If no sites, create a default
+if(sites.length===0){
+  const defSite={id:Date.now().toString(),name:'Työmaa 1',addr:'',code:'',color:SITE_COLORS[0],mgr:'',designer:'',company:''};
+  sites.push(defSite); save('tj_sites',sites);
+  activeSiteId=defSite.id; save('tj_active_site',activeSiteId);
+}
+if(!activeSiteId||!sites.find(s=>s.id===activeSiteId)){
+  activeSiteId=sites[0].id; save('tj_active_site',activeSiteId);
+}
+
+let editingTaskId=null, editingCheckId=null, editingNoteId=null, editingSiteId=null;
+let viewStartWeek=null;
+const WPX=70;
+let currentView='dash';
+
+// ── SITE UTILS ─────────────────────────────────────────────────
+function getActiveSite(){return sites.find(s=>s.id===activeSiteId)||sites[0]}
+function siteTasks(sid){
+  const id=sid||(activeSiteId||'');
+  if(!id) return [];
+  return tasks.filter(t=>t.siteId===id);
+}
+function siteChecks(sid){
+  const id=sid||(activeSiteId||'');
+  if(!id) return [];
+  return checks.filter(c=>c.siteId===id);
+}
+function escId(id){return id.replace(/'/g,"\\'");}
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// ── SITE SWITCHER ──────────────────────────────────────────────
+function renderSiteSwitcher(){
+  const el=document.getElementById('site-switcher');
+  el.innerHTML=sites.map(s=>`<button class="site-pill${s.id===activeSiteId?' active':''}" onclick="switchSite('${escId(s.id)}')" style="${s.id===activeSiteId?'':'border-color:'+s.color+'44;color:'+s.color}">
+    ${s.id===activeSiteId?'':'<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:'+s.color+';margin-right:4px;vertical-align:middle"></span>'}${escHtml(s.name)}
+  </button>`).join('')+`<button class="site-pill add-site" onclick="openSiteModal()">+ Uusi</button>`;
+}
+function switchSite(id){
+  activeSiteId=id; save('tj_active_site',id);
+  viewStartWeek=null;
+  renderAll();
+}
+
+// ── SITE MODAL ─────────────────────────────────────────────────
+function openSiteModal(){
+  renderSiteList();
+  initSiteColorPicker(SITE_COLORS[sites.length%SITE_COLORS.length]);
+  document.getElementById('site-modal').style.display='flex';
+}
+function closeSiteModal(){document.getElementById('site-modal').style.display='none';renderAll();}
+function renderSiteList(){
+  const el=document.getElementById('site-list-el');
+  el.innerHTML=sites.map(s=>{
+    const tc=siteTasks(s.id).length;
+    const done=siteTasks(s.id).filter(t=>t.progress===100).length;
+    return`<div class="site-list-item">
+      <div class="sli-dot" style="background:${s.color}"></div>
+      <div style="flex:1">
+        <div class="sli-name">${escHtml(s.name)}${s.code?` <span style="font-size:9px;color:var(--text2);font-weight:400">(${escHtml(s.code)})</span>`:''}</div>
+        <div class="sli-meta">${escHtml(s.addr||'Ei osoitetta')} · ${tc} tehtävää · ${done} valmis</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="editSite('${escId(s.id)}')">✏</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteSite('${escId(s.id)}')">🗑</button>
+    </div>`;
+  }).join('');
+}
+function initSiteColorPicker(sel){
+  const cp=document.getElementById('site-cp'); cp.innerHTML='';
+  SITE_COLORS.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='cdot'+(c===sel?' sel':''); d.style.background=c; d.dataset.c=c;
+    d.onclick=()=>{document.querySelectorAll('#site-cp .cdot').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');};
+    cp.appendChild(d);
+  });
+}
+function addSite(){
+  const name=document.getElementById('ns-name').value.trim();
+  if(!name){alert('Anna työmaan nimi');return;}
+  const sc=document.querySelector('#site-cp .cdot.sel');
+  const site={id:genId(),name,addr:document.getElementById('ns-addr').value.trim(),code:document.getElementById('ns-code').value.trim(),color:sc?sc.dataset.c:SITE_COLORS[0],mgr:document.getElementById('ns-mgr').value.trim(),designer:document.getElementById('ns-designer').value.trim(),company:document.getElementById('ns-company').value.trim()};
+  sites.push(site); save('tj_sites',sites);
+  document.getElementById('ns-name').value='';
+  document.getElementById('ns-addr').value='';
+  document.getElementById('ns-code').value='';
+  document.getElementById('ns-mgr').value='';
+  document.getElementById('ns-designer').value='';
+  document.getElementById('ns-company').value='';
+  renderSiteList(); renderSiteSwitcher(); populateSiteSelects();
+}
+function deleteSite(id){
+  if(sites.length<=1){alert('Vähintään yksi työmaa täytyy olla.');return;}
+  if(!confirm('Poista työmaa ja kaikki sen tehtävät?'))return;
+  sites=sites.filter(s=>s.id!==id);
+  tasks=tasks.filter(t=>t.siteId!==id);
+  checks=checks.filter(c=>c.siteId!==id);
+  notes=notes.filter(n=>n.siteId!==id);
+  save('tj_sites',sites); save('tj_tasks',tasks); save('tj_checks',checks); save('tj_notes',notes);
+  if(activeSiteId===id){activeSiteId=sites[0].id;save('tj_active_site',activeSiteId);}
+  renderSiteList(); renderSiteSwitcher(); populateSiteSelects();
+}
+function editSite(id){
+  const s=sites.find(x=>x.id===id); if(!s)return;
+  const n=prompt('Työmaan nimi:',s.name); if(!n)return;
+  s.name=n;
+  const a=prompt('Osoite:',s.addr||''); if(a!==null)s.addr=a;
+  const c=prompt('Koodi:',s.code||''); if(c!==null)s.code=c;
+  const m=prompt('Päällikkö:',s.mgr||''); if(m!==null)s.mgr=m;
+  const d=prompt('Suunnittelija:',s.designer||''); if(d!==null)s.designer=d;
+  const co=prompt('Yritys / Tilaaja:',s.company||''); if(co!==null)s.company=co;
+  save('tj_sites',sites); renderSiteList(); renderSiteSwitcher(); populateSiteSelects(); renderAll();
+}
+
+// ── TASK MODAL ─────────────────────────────────────────────────
+function openAddTaskModal(id){
+  editingTaskId=id||null; const t=id?tasks.find(x=>x.id===id):null;
+  document.getElementById('task-modal-title').textContent=t?'Muokkaa tehtävää':'Lisää tehtävä';
+  document.getElementById('del-task-btn').style.display=t?'inline-flex':'none';
+  document.getElementById('f-name').value=t?t.name:'';
+  document.getElementById('f-desc').value=t?(t.desc||''):'';
+  document.getElementById('f-resp').value=t?(t.resp||''):'';
+  document.getElementById('f-loc').value=t?(t.loc||''):'';
+  document.getElementById('f-ppl').value=t?(t.ppl||''):'';
+  document.getElementById('f-equip').value=t?(t.equip||''):'';
+  document.getElementById('f-start').value=t?t.start:'';
+  document.getElementById('f-end').value=t?t.end:'';
+  document.getElementById('f-prog').value=t?(t.progress||0):0;
+  document.getElementById('pval').textContent=t?(t.progress||0):0;
+  document.getElementById('f-prio').value=t?(t.prio||'normal'):'normal';
+  const siteEl=document.getElementById('f-site');
+  populateSiteSelect(siteEl, t?t.siteId:activeSiteId);
+  initColorPicker(t?(t.color||COLORS[0]):COLORS[tasks.length%COLORS.length]);
+  document.getElementById('task-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('f-name').focus(),100);
+}
+function closeTaskModal(){document.getElementById('task-modal').style.display='none';editingTaskId=null;}
+
+// Progress slider — safe listener after DOM ready
+document.addEventListener('DOMContentLoaded',()=>{
+  const fp=document.getElementById('f-prog');
+  if(fp) fp.addEventListener('input',e=>document.getElementById('pval').textContent=e.target.value);
+});
+
+function saveTask(){
+  const name=document.getElementById('f-name').value.trim();
+  const resp=document.getElementById('f-resp').value.trim();
+  const start=document.getElementById('f-start').value;
+  const end=document.getElementById('f-end').value;
+  const siteId=document.getElementById('f-site').value;
+  if(!name||!resp||!start||!end){alert('Täytä pakolliset kentät.');return;}
+  if(end<start){alert('Loppupäivä ei voi olla ennen alkupäivää.');return;}
+  const sc=document.querySelector('#cp .cdot.sel');
+  const task={
+    id:editingTaskId||genId(),siteId,name,
+    desc:document.getElementById('f-desc').value.trim(),resp,
+    loc:document.getElementById('f-loc').value.trim(),
+    ppl:parseInt(document.getElementById('f-ppl').value)||0,
+    equip:document.getElementById('f-equip').value.trim(),
+    start,end,progress:parseInt(document.getElementById('f-prog').value),
+    prio:document.getElementById('f-prio').value,
+    color:sc?sc.dataset.c:COLORS[0]
+  };
+  if(editingTaskId){const i=tasks.findIndex(t=>t.id===editingTaskId);tasks[i]=task;}
+  else tasks.push(task);
+  save('tj_tasks',tasks); closeTaskModal(); renderAll();
+}
+function deleteTask(){
+  if(!confirm('Poistetaanko tehtävä?'))return;
+  tasks=tasks.filter(t=>t.id!==editingTaskId);
+  save('tj_tasks',tasks); closeTaskModal(); renderAll();
+}
+
+// ── CHECK MODAL ────────────────────────────────────────────────
+function openAddCheckModal(id){
+  editingCheckId=id||null; const c=id?checks.find(x=>x.id===id):null;
+  document.getElementById('check-modal-title').textContent=c?'Muokkaa':'Lisää tarkistuskohde';
+  document.getElementById('del-check-btn').style.display=c?'inline-flex':'none';
+  document.getElementById('ci-text').value=c?c.text:'';
+  document.getElementById('ci-resp').value=c?(c.resp||''):'';
+  if(c)document.getElementById('ci-cat').value=c.cat||'Turvallisuus';
+  populateSiteSelect(document.getElementById('ci-site'),c?c.siteId:activeSiteId);
+  document.getElementById('check-modal').style.display='flex';
+}
+function closeCheckModal(){document.getElementById('check-modal').style.display='none';editingCheckId=null;}
+function saveCheckItem(){
+  const text=document.getElementById('ci-text').value.trim();
+  if(!text){alert('Anna tarkistuskohteen teksti.');return;}
+  const item={
+    id:editingCheckId||genId(),
+    siteId:document.getElementById('ci-site').value,
+    text,cat:document.getElementById('ci-cat').value,
+    resp:document.getElementById('ci-resp').value.trim(),
+    done:false,doneAt:null,createdAt:new Date().toISOString()
+  };
+  if(editingCheckId){
+    const i=checks.findIndex(c=>c.id===editingCheckId);
+    item.done=checks[i].done; item.doneAt=checks[i].doneAt;
+    checks[i]=item;
+  } else checks.push(item);
+  save('tj_checks',checks); closeCheckModal(); renderCheckView();
+}
+function deleteCheckItem(){
+  if(!confirm('Poistetaanko?'))return;
+  checks=checks.filter(c=>c.id!==editingCheckId);
+  save('tj_checks',checks); closeCheckModal(); renderCheckView();
+}
+function toggleCheck(id){
+  const c=checks.find(x=>x.id===id); if(!c)return;
+  c.done=!c.done; c.doneAt=c.done?new Date().toISOString():null;
+  save('tj_checks',checks); renderCheckView(); renderDash();
+}
+
+// ── NOTE MODAL ─────────────────────────────────────────────────
+function openAddNoteModal(id){
+  editingNoteId=id||null; const n=id?notes.find(x=>x.id===id):null;
+  document.getElementById('note-modal-title').textContent=n?'Muokkaa muistiinpanoa':'Uusi muistiinpano';
+  document.getElementById('del-note-btn').style.display=n?'inline-flex':'none';
+  document.getElementById('ni-title').value=n?n.title:'';
+  document.getElementById('ni-body').value=n?n.body:'';
+  populateSiteSelect(document.getElementById('ni-site'),n?n.siteId:activeSiteId);
+  document.getElementById('note-modal').style.display='flex';
+  setTimeout(()=>document.getElementById('ni-title').focus(),100);
+}
+function closeNoteModal(){document.getElementById('note-modal').style.display='none';editingNoteId=null;}
+function saveNote(){
+  const title=document.getElementById('ni-title').value.trim();
+  const body=document.getElementById('ni-body').value.trim();
+  if(!title||!body){alert('Täytä otsikko ja sisältö.');return;}
+  const note={
+    id:editingNoteId||genId(),
+    siteId:document.getElementById('ni-site').value,
+    title,body,updatedAt:new Date().toISOString()
+  };
+  if(editingNoteId){const i=notes.findIndex(n=>n.id===editingNoteId);notes[i]=note;}
+  else notes.push(note);
+  save('tj_notes',notes); closeNoteModal(); renderNotesView();
+}
+function deleteNote(){
+  if(!confirm('Poistetaanko muistiinpano?'))return;
+  notes=notes.filter(n=>n.id!==editingNoteId);
+  save('tj_notes',notes); closeNoteModal(); renderNotesView();
+}
+
+// ── COLOR PICKERS ──────────────────────────────────────────────
+function initColorPicker(sel){
+  const cp=document.getElementById('cp'); cp.innerHTML='';
+  COLORS.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='cdot'+(c===sel?' sel':''); d.style.background=c; d.dataset.c=c;
+    d.onclick=()=>{document.querySelectorAll('#cp .cdot').forEach(x=>x.classList.remove('sel'));d.classList.add('sel');};
+    cp.appendChild(d);
+  });
+}
+
+// ── SITE SELECT POPULATION ─────────────────────────────────────
+function populateSiteSelect(el, selectedId){
+  el.innerHTML=sites.map(s=>`<option value="${s.id}"${s.id===selectedId?' selected':''}>${s.name}</option>`).join('');
+}
+function populateSiteSelects(){
+  const all='<option value="__all__">Kaikki työmaat</option>'+sites.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  document.getElementById('list-filter-site').innerHTML=all;
+  document.getElementById('check-filter-site').innerHTML=all;
+  document.getElementById('notes-filter-site').innerHTML=all;
+}
+
+// ── VIEW SWITCHING ─────────────────────────────────────────────
+function switchView(v){
+  currentView=v;
+  document.querySelectorAll('.vtab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.view-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('vtab-'+v).classList.add('active');
+  document.getElementById('panel-'+v).classList.add('active');
+  if(v==='gantt')renderGantt();
+  else if(v==='list')renderListView();
+  else if(v==='check')renderCheckView();
+  else if(v==='notes')renderNotesView();
+  else if(v==='dash')renderDash();
+}
+
+// ── DASHBOARD ─────────────────────────────────────────────────
+function renderDash(){
+  const wrap=document.getElementById('dash-wrap');
+  const today=new Date().toISOString().split('T')[0];
+  const allTasks=tasks;
+  const totTasks=allTasks.length;
+  const doneTasks=allTasks.filter(t=>t.progress===100).length;
+  const activeTasks=allTasks.filter(t=>t.start<=today&&t.end>=today).length;
+  const overdueTasks=allTasks.filter(t=>t.end<today&&t.progress<100).length;
+  const totalPpl=allTasks.reduce((s,t)=>s+(t.ppl||0),0);
+  const totalChecks=checks.length;
+  const doneChecks=checks.filter(c=>c.done).length;
+
+  // Upcoming tasks in next 7 days
+  const soon=new Date(); soon.setDate(soon.getDate()+7);
+  const soonStr=soon.toISOString().split('T')[0];
+  const upcoming=allTasks.filter(t=>t.start>today&&t.start<=soonStr&&t.progress<100).sort((a,b)=>a.start.localeCompare(b.start)).slice(0,6);
+
+  // Per-site summary
+  const siteSummary=sites.map(s=>{
+    const st=siteTasks(s.id);
+    const sd=st.filter(t=>t.progress===100).length;
+    const sa=st.filter(t=>t.start<=today&&t.end>=today).length;
+    const so=st.filter(t=>t.end<today&&t.progress<100).length;
+    const pct=st.length?Math.round(st.reduce((a,t)=>a+t.progress,0)/st.length):0;
+    return{...s,tc:st.length,done:sd,active:sa,overdue:so,pct};
+  });
+
+  wrap.innerHTML=`
+    <div class="dash-grid">
+      <div class="dash-card"><div class="dash-card-title">Tehtäviä yhteensä</div><div class="dash-stat">${totTasks}</div><div class="dash-stat-sub">${doneTasks} valmis · ${activeTasks} käynnissä</div></div>
+      <div class="dash-card"><div class="dash-card-title">Henkilöstö tänään</div><div class="dash-stat">${totalPpl}</div><div class="dash-stat-sub">kaikilla työmailla</div></div>
+      <div class="dash-card"><div class="dash-card-title" style="color:var(--accent3)">Myöhässä</div><div class="dash-stat" style="color:${overdueTasks>0?'var(--accent3)':'var(--accent2)'}">${overdueTasks}</div><div class="dash-stat-sub">tehtävää ylittänyt deadlinen</div></div>
+      <div class="dash-card"><div class="dash-card-title">Tarkistuslista</div><div class="dash-stat" style="color:var(--accent2)">${doneChecks}/${totalChecks}</div><div class="dash-stat-sub">kohtaa tarkistettu</div></div>
+    </div>
+
+    <div class="dash-card" style="margin-bottom:10px">
+      <div class="dash-card-title">Työmaat — yleiskatsaus</div>
+      ${siteSummary.map(s=>`
+        <div class="dash-site-row">
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;gap:6px"><div class="ldot" style="background:${s.color}"></div><div class="dash-site-name">${s.name}${s.code?` <span style="font-size:9px;color:var(--text2)">(${s.code})</span>`:''}</div>${s.overdue>0?`<span class="overdue-badge">${s.overdue} myöhässä</span>`:''}</div>
+            <div class="dash-site-meta">${s.addr||''} · ${s.tc} tehtävää · ${s.active} käynnissä · ${s.pct}% valmis</div>
+            <div class="mini-progress" style="margin-top:5px"><div class="mini-progress-fill" style="width:${s.pct}%;background:${s.color}"></div></div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="margin-left:10px" onclick="switchSite('${s.id}');switchView('gantt')">→ Aikataulu</button>
+        </div>`).join('')}
+    </div>
+
+    ${upcoming.length?`<div class="dash-card">
+      <div class="dash-card-title">Alkamassa seuraavan viikon aikana</div>
+      ${upcoming.map(t=>{
+        const site=sites.find(s=>s.id===t.siteId);
+        return`<div class="upcoming-item">
+          <div class="upcoming-dot" style="background:${t.color}"></div>
+          <div>
+            <div class="upcoming-text">${t.name} ${t.prio==='high'?'🔴':''}</div>
+            <div class="upcoming-meta">${site?site.name:''} · ${t.resp} · alkaa ${fmtD(t.start)}</div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`:''}
+  `;
+}
+
+// ── GANTT ZOOM ─────────────────────────────────────────────────
+let ganttZoom='week'; // 'week' | 'day'
+let viewStartDay=null; // used in day mode
+const DAY_PX=22;
+
+function setZoom(z){
+  ganttZoom=z;
+  document.getElementById('zoom-week').classList.toggle('active',z==='week');
+  document.getElementById('zoom-day').classList.toggle('active',z==='day');
+  viewStartDay=null; viewStartWeek=null;
+  renderGantt();
+}
+
+function jumpToToday(){
+  if(ganttZoom==='week'){viewStartWeek=addW(getMon(new Date()),window.innerWidth<=768?-1:-2);}
+  else{viewStartDay=new Date();viewStartDay.setDate(viewStartDay.getDate()-3);viewStartDay.setHours(0,0,0,0);}
+  renderGantt();
+}
+function shiftPeriods(n){
+  if(ganttZoom==='week'){
+    if(!viewStartWeek)jumpToToday();
+    viewStartWeek=addW(viewStartWeek,n);
+  } else {
+    if(!viewStartDay)jumpToToday();
+    viewStartDay=new Date(viewStartDay);
+    // In day mode: ‹/› = 1 week, «/» = 4 weeks
+    viewStartDay.setDate(viewStartDay.getDate()+n*7);
+  }
+  renderGantt();
+}
+// keep old name for any stray calls
+function shiftWeeks(n){shiftPeriods(n);}
+
+// ── GANTT ──────────────────────────────────────────────────────
+function renderGantt(){
+  const site=getActiveSite();
+  document.getElementById('gantt-site-name').textContent=site.name+(site.mgr?' · Päällikkö: '+site.mgr:'');
+  const container=document.getElementById('gantt-container');
+  const todayDate=new Date(); todayDate.setHours(0,0,0,0);
+  const td=todayDate.toISOString().split('T')[0];
+  const myTasks=siteTasks().sort((a,b)=>a.start.localeCompare(b.start));
+
+  if(ganttZoom==='week') renderGanttWeek(container, myTasks, todayDate, td, site);
+  else renderGanttDay(container, myTasks, todayDate, td, site);
+}
+
+function renderGanttWeek(container, myTasks, todayDate, td, site){
+  const today=getMon(todayDate);
+  const isMob=window.innerWidth<=768;
+  const VW=isMob?8:16;
+  if(!viewStartWeek){
+    if(myTasks.length){
+      const sorted=[...myTasks].sort((a,b)=>a.start.localeCompare(b.start));
+      viewStartWeek=addW(getMon(new Date(sorted[0].start+'T00:00:00')),-1);
+    } else {
+      viewStartWeek=addW(today,-2);
+    }
+  }
+  const lastW=addW(viewStartWeek,VW-1);
+  document.getElementById('week-display').textContent=`vk${wkNum(viewStartWeek)} – vk${wkNum(lastW)}`;
+  const weeks=[]; for(let i=0;i<VW;i++)weeks.push(addW(viewStartWeek,i));
+
+  renderStats(myTasks, td);
+  renderLegendEl(myTasks);
+
+  // Group header: months above weeks
+  const months=[];
+  weeks.forEach(w=>{
+    const mo=w.toLocaleDateString('fi-FI',{month:'short',year:'2-digit'});
+    if(!months.length||months[months.length-1].label!==mo)months.push({label:mo,count:0});
+    months[months.length-1].count++;
+  });
+  const moH=months.map(m=>`<div style="flex:0 0 ${m.count*WPX}px;border-right:1px solid var(--border);text-align:center;font-size:9px;font-weight:700;color:var(--text2);padding:3px 0;letter-spacing:.05em;text-transform:uppercase">${m.label}</div>`).join('');
+
+  const colsH=weeks.map(w=>{
+    const isT=getMon(todayDate).getTime()===w.getTime();
+    return`<div class="wch${isT?' tw':''}" style="width:${WPX}px;min-width:${WPX}px">vk${wkNum(w)}<br><span style="font-size:7px;opacity:.6">${fmtD(w.toISOString().split('T')[0])}</span></div>`;
+  }).join('');
+
+  let html=`<div class="gantt-header">
+    <div class="gnr-h">#</div>
+    <div class="glh" style="width:155px;min-width:155px">TYÖVAIHE / VASTUU</div>
+    <div class="gkesto-h">KESTO</div>
+    <div class="gcols-h" style="flex-direction:column;display:flex">
+      <div style="display:flex;border-bottom:1px solid var(--border)">${moH}</div>
+      <div style="display:flex">${colsH}</div>
+    </div>
+  </div>`;
+
+  if(!myTasks.length){
+    html+=emptyGantt();
+  } else {
+    const todayPx=(getMon(todayDate).getTime()-viewStartWeek.getTime())/(7*86400000)*WPX;
+    const totW=VW*WPX;
+    myTasks.forEach((task,idx)=>{
+      const tS=new Date(task.start+'T00:00:00'),tE=new Date(task.end+'T00:00:00');
+      const off=(getMon(tS).getTime()-viewStartWeek.getTime())/(7*86400000);
+      const durW=(tE.getTime()-tS.getTime()+86400000)/(7*86400000);
+      const bl=off*WPX, bw=Math.max(durW*WPX,18);
+      const cells=weeks.map(w=>`<div class="gc${getMon(todayDate).getTime()===w.getTime()?' tw':''}" style="width:${WPX}px;min-width:${WPX}px"></div>`).join('');
+      const bVis=bl<totW&&(bl+bw)>0;
+      const isOv=task.end<td&&task.progress<100;
+      const isHi=task.prio==='high';
+      const bar=bVis?`<div class="gbar" style="left:${bl}px;width:${bw}px;background:${task.color};color:${isLt(task.color)?'#000':'#fff'}${isHi?';box-shadow:0 0 0 2px #e74c6f':''}" onclick="openAddTaskModal('${task.id}')">
+        <div style="position:absolute;left:0;top:0;height:100%;width:${task.progress}%;background:rgba(255,255,255,.25);border-radius:4px;pointer-events:none"></div>
+        <span style="position:relative;z-index:1;overflow:hidden;text-overflow:ellipsis">${isHi?'🔴 ':''}${task.name}</span>
+      </div>`:'';
+      html+=`<div class="gantt-row${isOv?' overdue-row':''}">
+        <div class="gnr">${idx+1}</div>
+        <div class="grl" style="width:155px;min-width:155px" onclick="openAddTaskModal('${task.id}')">
+          <div class="rn" style="color:${isOv?'var(--accent3)':task.color}">${isOv?'⚠ ':''}${task.name}</div>
+          <div class="rs">${task.resp}${task.loc?' · '+task.loc:''}</div>
+        </div>
+        <div class="gkesto">${daysBetween(task.start,task.end)} pv</div>
+        <div class="gcols" style="position:relative">${cells}${bar}${todayPx>=0&&todayPx<=totW?`<div class="today-line" style="left:${todayPx}px"></div>`:''}</div>
+      </div>`;
+    });
+  }
+  container.innerHTML=html;
+}
+
+function renderGanttDay(container, myTasks, todayDate, td, site){
+  const isMob=window.innerWidth<=768;
+  const VD=isMob?14:28;
+  if(!viewStartDay){
+    if(myTasks.length){viewStartDay=new Date(myTasks[0].start+'T00:00:00');viewStartDay.setDate(viewStartDay.getDate()-2);}
+    else{viewStartDay=new Date(todayDate);viewStartDay.setDate(viewStartDay.getDate()-3);}
+  }
+  const days=[]; for(let i=0;i<VD;i++){const d=new Date(viewStartDay);d.setDate(d.getDate()+i);days.push(d);}
+  const lastD=days[days.length-1];
+  document.getElementById('week-display').textContent=`${fmtD(viewStartDay.toISOString().split('T')[0])} – ${fmtD(lastD.toISOString().split('T')[0])}`;
+
+  renderStats(myTasks, td);
+  renderLegendEl(myTasks);
+
+  // Month grouping
+  const months=[];
+  days.forEach(d=>{
+    const mo=d.toLocaleDateString('fi-FI',{month:'short'});
+    if(!months.length||months[months.length-1].label!==mo)months.push({label:mo,count:0});
+    months[months.length-1].count++;
+  });
+  const moH=months.map(m=>`<div style="flex:0 0 ${m.count*DAY_PX}px;border-right:1px solid var(--border);text-align:center;font-size:9px;font-weight:700;color:var(--text2);padding:3px 0;text-transform:uppercase;letter-spacing:.05em">${m.label}</div>`).join('');
+
+  const colsH=days.map(d=>{
+    const isT=d.toISOString().split('T')[0]===td;
+    const isWe=d.getDay()===0||d.getDay()===6;
+    return`<div class="wch${isT?' tw':''}" style="width:${DAY_PX}px;min-width:${DAY_PX}px;background:${isWe?'rgba(255,255,255,.03)':'transparent'};font-size:8px;padding:4px 0">${d.getDate()}<br><span style="font-size:7px;opacity:.5">${['Su','Ma','Ti','Ke','To','Pe','La'][d.getDay()]}</span></div>`;
+  }).join('');
+
+  let html=`<div class="gantt-header">
+    <div class="gnr-h">#</div>
+    <div class="glh" style="width:155px;min-width:155px">TYÖVAIHE / VASTUU</div>
+    <div class="gkesto-h">KESTO</div>
+    <div class="gcols-h" style="flex-direction:column;display:flex">
+      <div style="display:flex;border-bottom:1px solid var(--border)">${moH}</div>
+      <div style="display:flex">${colsH}</div>
+    </div>
+  </div>`;
+
+  if(!myTasks.length){
+    html+=emptyGantt();
+  } else {
+    const totW=VD*DAY_PX;
+    myTasks.forEach((task,idx)=>{
+      const tS=new Date(task.start+'T00:00:00');
+      const tE=new Date(task.end+'T00:00:00');
+      const diffStart=Math.round((tS-viewStartDay)/86400000);
+      const durDays=Math.round((tE-tS)/86400000)+1;
+      const bl=diffStart*DAY_PX, bw=Math.max(durDays*DAY_PX,DAY_PX);
+      const todayPx=Math.round((todayDate-viewStartDay)/86400000)*DAY_PX;
+
+      const cells=days.map(d=>{
+        const ds=d.toISOString().split('T')[0];
+        const isT=ds===td; const isWe=d.getDay()===0||d.getDay()===6;
+        return`<div class="gc${isT?' tw':''}" style="width:${DAY_PX}px;min-width:${DAY_PX}px;background:${isWe?'rgba(255,255,255,.025)':'transparent'}"></div>`;
+      }).join('');
+
+      const bVis=bl<totW&&(bl+bw)>0;
+      const isOv=task.end<td&&task.progress<100;
+      const isHi=task.prio==='high';
+      const bar=bVis?`<div class="gbar" style="left:${Math.max(0,bl)}px;width:${bw-(bl<0?-bl:0)}px;background:${task.color};color:${isLt(task.color)?'#000':'#fff'}${isHi?';box-shadow:0 0 0 2px #e74c6f':''}" onclick="openAddTaskModal('${task.id}')">
+        <div style="position:absolute;left:0;top:0;height:100%;width:${task.progress}%;background:rgba(255,255,255,.25);border-radius:4px;pointer-events:none"></div>
+        <span style="position:relative;z-index:1;overflow:hidden;text-overflow:ellipsis">${isHi?'🔴 ':''}${task.name}</span>
+      </div>`:'';
+
+      html+=`<div class="gantt-row${isOv?' overdue-row':''}">
+        <div class="gnr">${idx+1}</div>
+        <div class="grl" style="width:155px;min-width:155px" onclick="openAddTaskModal('${task.id}')">
+          <div class="rn" style="color:${isOv?'var(--accent3)':task.color}">${isOv?'⚠ ':''}${task.name}</div>
+          <div class="rs">${task.resp}${task.loc?' · '+task.loc:''}</div>
+        </div>
+        <div class="gkesto">${daysBetween(task.start,task.end)} pv</div>
+        <div class="gcols" style="position:relative">${cells}${bar}${todayPx>=0&&todayPx<=totW?`<div class="today-line" style="left:${todayPx}px"></div>`:''}</div>
+      </div>`;
+    });
+  }
+  container.innerHTML=html;
+}
+
+function emptyGantt(){return`<div style="padding:50px 20px;text-align:center;color:var(--text3)"><div style="font-size:38px;margin-bottom:10px">🏗️</div><div style="font-size:14px;font-weight:700;margin-bottom:6px">Ei tehtäviä tällä työmaalla</div><div style="font-size:11px">Paina "+ Lisää" aloittaaksesi</div></div>`;}
+
+function renderStats(myTasks, td){
+  const tot=myTasks.length, done=myTasks.filter(t=>t.progress===100).length;
+  const act=myTasks.filter(t=>t.start<=td&&t.end>=td).length;
+  const ov=myTasks.filter(t=>t.end<td&&t.progress<100).length;
+  const ppl=myTasks.reduce((s,t)=>s+(t.ppl||0),0);
+  document.getElementById('stats-row').innerHTML=
+    `<div class="stat">Tehtäviä: <strong>${tot}</strong></div>
+     <div class="stat">Käynnissä: <strong>${act}</strong></div>
+     <div class="stat stat-ok">Valmiita: <strong>${done}</strong></div>
+     ${ov?`<div class="stat stat-warn">Myöhässä: <strong>${ov}</strong></div>`:''}
+     <div class="stat">Henkilöstöä: <strong>${ppl}</strong></div>`;
+}
+function renderLegendEl(myTasks){
+  const resp=[...new Set(myTasks.map(t=>t.resp))].slice(0,8);
+  document.getElementById('legend').innerHTML=resp.map(r=>{const t=myTasks.find(x=>x.resp===r);return`<div class="legend-item"><div class="ldot" style="background:${t?t.color:'#666'}"></div>${r}</div>`;}).join('');
+}
+
+// ── LIST VIEW ──────────────────────────────────────────────────
+function renderListView(){
+  const siteF=document.getElementById('list-filter-site').value;
+  const statF=document.getElementById('list-filter-status').value;
+  const td=new Date().toISOString().split('T')[0];
+  let tt=[...tasks];
+  if(siteF!=='__all__')tt=tt.filter(t=>t.siteId===siteF);
+  if(statF==='active')tt=tt.filter(t=>t.start<=td&&t.end>=td&&t.progress<100);
+  else if(statF==='upcoming')tt=tt.filter(t=>t.start>td&&t.progress<100);
+  else if(statF==='done')tt=tt.filter(t=>t.progress===100);
+  else if(statF==='overdue')tt=tt.filter(t=>t.end<td&&t.progress<100);
+  tt.sort((a,b)=>a.start.localeCompare(b.start));
+  const el=document.getElementById('list-view');
+  if(!tt.length){el.innerHTML=`<div style="text-align:center;padding:50px 20px;color:var(--text3)"><div style="font-size:36px;margin-bottom:10px">📋</div><p style="font-size:13px">Ei tehtäviä</p></div>`;return;}
+  const site=s=>sites.find(x=>x.id===s);
+  el.innerHTML=tt.map(t=>{
+    const s=site(t.siteId); const isOv=t.end<td&&t.progress<100;
+    return`<div class="task-card" onclick="openAddTaskModal('${t.id}')" style="border-left-color:${t.color}">
+      <div class="tc-head">
+        <div class="tc-name">${t.prio==='high'?'🔴 ':''}${t.name}${isOv?' <span style="color:var(--accent3);font-size:10px">⚠ myöhässä</span>':''}</div>
+        <div class="tc-dates">${fmtD(t.start)} – ${fmtD(t.end)}</div>
+      </div>
+      <div class="tc-meta">${s?`<span style="color:${s.color}">${s.name}</span> · `:''} ${t.resp}${t.loc?' · '+t.loc:''}</div>
+      <div class="tc-tags">
+        ${t.ppl?`<span class="tag" style="background:#4ecdc422;color:#4ecdc4">👷 ${t.ppl}</span>`:''}
+        ${t.equip?`<span class="tag" style="background:#c084fc22;color:#c084fc">🔧 ${t.equip}</span>`:''}
+        <span class="tag" style="background:${t.color}22;color:${t.color}">${t.progress}%</span>
+        <span class="tag" style="background:var(--surface3);color:var(--text2)">${daysBetween(t.start,t.end)} pv</span>
+      </div>
+      <div class="pb"><div class="pbf" style="width:${t.progress}%;background:${t.color}"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ── CHECKLIST VIEW ─────────────────────────────────────────────
+function renderCheckView(){
+  const siteF=document.getElementById('check-filter-site').value;
+  let cc=[...checks];
+  if(siteF!=='__all__')cc=cc.filter(c=>c.siteId===siteF);
+  const cats=[...new Set(cc.map(c=>c.cat||'Muu'))];
+  const el=document.getElementById('checklist-wrap');
+  if(!cc.length){el.innerHTML=`<div style="text-align:center;padding:50px 20px;color:var(--text3)"><div style="font-size:36px;margin-bottom:10px">✅</div><p style="font-size:13px">Ei tarkistuskohteita</p><p style="font-size:11px;margin-top:6px">Lisää uusi tarkistus ylhäältä</p></div>`;return;}
+  el.innerHTML=cats.map(cat=>{
+    const items=cc.filter(c=>c.cat===cat);
+    const doneC=items.filter(c=>c.done).length;
+    return`<div class="check-section">
+      <div class="check-section-title"><span>${catIcon(cat)} ${cat}</span><span style="font-size:10px;font-family:'DM Mono',monospace">${doneC}/${items.length}</span></div>
+      ${items.map(c=>`<div class="check-item${c.done?' done':''}" onclick="toggleCheck('${c.id}')">
+        <div class="check-box">${c.done?'<span style="font-size:12px;color:#000">✓</span>':''}</div>
+        <div style="flex:1">
+          <div class="ci-text">${c.text}</div>
+          ${c.resp?`<div class="ci-meta">👤 ${c.resp}</div>`:''}
+          ${c.done&&c.doneAt?`<div class="ci-meta">✅ ${new Date(c.doneAt).toLocaleDateString('fi-FI')}</div>`:''}
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openAddCheckModal('${c.id}')" style="flex-shrink:0">✏</button>
+      </div>`).join('')}
+    </div>`;
+  }).join('');
+}
+function catIcon(c){return{Turvallisuus:'🦺',Laatu:'✔',Ympäristö:'🌱',Dokumentointi:'📄',Muu:'📌'}[c]||'📌';}
+
+// ── NOTES VIEW ─────────────────────────────────────────────────
+function renderNotesView(){
+  const siteF=document.getElementById('notes-filter-site').value;
+  let nn=[...notes];
+  if(siteF!=='__all__')nn=nn.filter(n=>n.siteId===siteF);
+  nn.sort((a,b)=>b.updatedAt.localeCompare(a.updatedAt));
+  const el=document.getElementById('notes-wrap');
+  if(!nn.length){el.innerHTML=`<div style="text-align:center;padding:50px 20px;color:var(--text3)"><div style="font-size:36px;margin-bottom:10px">📝</div><p style="font-size:13px">Ei muistiinpanoja</p></div>`;return;}
+  el.innerHTML=nn.map(n=>{
+    const s=sites.find(x=>x.id===n.siteId);
+    return`<div class="note-card" onclick="openAddNoteModal('${n.id}')">
+      ${s?`<div class="note-card-site" style="background:${s.color}22;color:${s.color}">${s.name}</div>`:''}
+      <div class="note-card-title">${n.title}</div>
+      <div class="note-card-body">${n.body}</div>
+      <div class="note-card-meta">Muokattu ${new Date(n.updatedAt).toLocaleDateString('fi-FI',{day:'numeric',month:'long',year:'numeric'})}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── DATE UTILS ─────────────────────────────────────────────────
+function getMon(d){const dt=new Date(d),dy=dt.getDay();dt.setDate(dt.getDate()-dy+(dy===0?-6:1));dt.setHours(0,0,0,0);return dt;}
+function addW(d,n){const dt=new Date(d);dt.setDate(dt.getDate()+n*7);return dt;}
+function wkNum(d){const dt=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));dt.setUTCDate(dt.getUTCDate()+4-(dt.getUTCDay()||7));return Math.ceil((((dt-new Date(Date.UTC(dt.getUTCFullYear(),0,1)))/86400000)+1)/7);}
+function fmtD(s){if(!s)return'';const d=new Date(s+'T00:00:00');return d.toLocaleDateString('fi-FI',{day:'numeric',month:'numeric'});}
+function fmtDFull(s){if(!s)return'';const d=new Date(s+'T00:00:00');return d.toLocaleDateString('fi-FI',{day:'numeric',month:'numeric',year:'numeric'});}
+function daysBetween(s,e){return Math.round((new Date(e+'T00:00:00')-new Date(s+'T00:00:00'))/86400000)+1;}
+function isLt(hex){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return(r*299+g*587+b*114)/1000>128;}
+
+// ── CSV ────────────────────────────────────────────────────────
+function exportCSV(){
+  if(!tasks.length){alert('Ei tehtäviä.');return;}
+  const h='Työmaa,Työvaihe,Vastuuhenkilö,Sijainti,Henkilömäärä,Kalusto,Alkupäivä,Loppupäivä,Kesto (pv),Edistyminen,Prioriteetti\n';
+  const rows=tasks.map(t=>{
+    const s=sites.find(x=>x.id===t.siteId);
+    return[s?s.name:'',t.name,t.resp,t.loc,t.ppl,t.equip,t.start,t.end,daysBetween(t.start,t.end),t.progress+'%',t.prio||'normal']
+    .map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`)
+    .join(',');
+  }).join('\n');
+  const blob=new Blob(['\ufeff'+h+rows],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`tyomaa_aikataulu_${new Date().toISOString().split('T')[0]}.csv`;a.click();
+}
+
+// ── PDF ────────────────────────────────────────────────────────
+async function exportPDF(){
+  const site=getActiveSite();
+  const myTasks=siteTasks().sort((a,b)=>a.start.localeCompare(b.start));
+  if(!myTasks.length){alert('Ei tehtäviä tällä työmaalla.');return;}
+  const loader=document.createElement('div');
+  loader.className='pdf-loading';
+  loader.innerHTML='<div class="spinner"></div><div>Luodaan PDF:ää...</div>';
+  document.body.appendChild(loader);
+  await new Promise(r=>setTimeout(r,80));
+  try{
+    const today=getMon(new Date());
+    const PW=36,PV=18;
+    let minS=myTasks[0].start,maxE=myTasks[0].end;
+    myTasks.forEach(t=>{if(t.start<minS)minS=t.start;if(t.end>maxE)maxE=t.end;});
+    const pS=addW(getMon(new Date(minS+'T00:00:00')),-1);
+    const pE=addW(getMon(new Date(maxE+'T00:00:00')),2);
+    const nW=Math.min(Math.ceil((pE-pS)/(7*86400000)),26);
+    const wks=[]; for(let i=0;i<nW;i++)wks.push(addW(pS,i));
+    const todayPx=(today.getTime()-pS.getTime())/(7*86400000)*PW;
+    const totW=nW*PW;
+    const td=new Date().toISOString().split('T')[0];
+    const tot=myTasks.length,done=myTasks.filter(t=>t.progress===100).length;
+    const act=myTasks.filter(t=>t.start<=td&&t.end>=td).length;
+    const ov=myTasks.filter(t=>t.end<td&&t.progress<100).length;
+    const ppl=myTasks.reduce((s,t)=>s+(t.ppl||0),0);
+
+    const whH=wks.map(w=>{const isT=w.getTime()===today.getTime();return`<div class="gwh2${isT?' gwht':''}" style="width:${PW}px;min-width:${PW}px">vk${wkNum(w)}</div>`;}).join('');
+    const ganttH=myTasks.map((task,idx)=>{
+      const tS=new Date(task.start+'T00:00:00'),tE=new Date(task.end+'T00:00:00');
+      const off=(getMon(tS).getTime()-pS.getTime())/(7*86400000);
+      const dW=(tE.getTime()-tS.getTime()+86400000)/(7*86400000);
+      const bl=off*PW,bw=Math.max(dW*PW,8);
+      const cells=wks.map(w=>`<div class="gwc2" style="width:${PW}px;min-width:${PW}px;background:${w.getTime()===today.getTime()?'#fffbf0':'transparent'}"></div>`).join('');
+      const bV=bl<totW&&(bl+bw)>0;
+      const bar=bV?`<div class="gb" style="left:${bl}px;width:${bw}px;background:${task.color};color:${isLt(task.color)?'#000':'#fff'}"><span>${task.name}</span></div>`:'';
+      return`<div class="gr2">
+        <div style="width:22px;min-width:22px;padding:0 4px;font-size:8px;font-family:'DM Mono',monospace;color:#999;display:flex;align-items:center;justify-content:center;border-right:1px solid #e5e7eb">${idx+1}</div>
+        <div class="grl2">${task.name}</div>
+        <div style="width:38px;min-width:38px;padding:0 4px;font-size:8px;font-family:monospace;color:#666;display:flex;align-items:center;justify-content:center;border-right:1px solid #e5e7eb">${daysBetween(task.start,task.end)}pv</div>
+        <div class="gc3">${cells}${bar}${todayPx>=0&&todayPx<=totW?`<div class="tvl" style="left:${todayPx}px"></div>`:''}</div>
+      </div>`;
+    }).join('');
+
+    const tblH=myTasks.map((t,idx)=>`<tr><td style="text-align:center;color:#999">${idx+1}</td><td><span class="pcdot" style="background:${t.color}"></span>${t.name}${t.prio==='high'?' 🔴':''}</td><td>${t.resp}</td><td>${t.loc||'-'}</td><td>${fmtDFull(t.start)}</td><td>${fmtDFull(t.end)}</td><td>${daysBetween(t.start,t.end)} pv</td><td>${t.ppl||'-'}</td><td>${t.equip||'-'}</td><td>${t.progress}%</td></tr>`).join('');
+
+    const el=document.getElementById('pdf-cap');
+    el.style.opacity='1';
+    el.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;padding-bottom:10px;border-bottom:3px solid #1a1a2e">
+        <div>
+          <div style="font-size:11px;color:#666;font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px">${site.company||'Työmaa-aikataulu'}</div>
+          <div class="pt">${site.name}${site.code?' · '+site.code:''}</div>
+          ${site.addr?`<div class="pm" style="margin:2px 0">${site.addr}</div>`:''}
+          ${site.mgr?`<div style="font-size:10px;color:#444;margin-top:2px">Päällikkö: <strong>${site.mgr}</strong></div>`:''}
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:14px;font-weight:800;color:#1a1a2e;margin-bottom:4px">AIKATAULUSUUNNITELMA</div>
+          <div style="font-size:10px;color:#666">${new Date().toLocaleDateString('fi-FI',{day:'numeric',month:'long',year:'numeric'})}</div>
+          ${site.designer?`<div style="font-size:10px;color:#444;margin-top:2px">Suunnittelija: <strong>${site.designer}</strong></div>`:''}
+          <div style="font-size:9px;color:#aaa;margin-top:4px">Aikataulusuunnitelma</div>
+        </div>
+      </div>
+      <div class="ps"><span>Tehtäviä: <strong>${tot}</strong></span><span>Käynnissä: <strong>${act}</strong></span><span>Valmiita: <strong>${done}</strong></span><span>Myöhässä: <strong>${ov}</strong></span><span>Henkilöstöä: <strong>${ppl}</strong></span></div>
+      <div class="psec">GANTT-KAAVIO</div>
+      <div class="gw">
+        <div class="gh2">
+          <div style="width:22px;min-width:22px;padding:5px 4px;font-size:8px;font-weight:700;color:#fff;text-align:center;border-right:1px solid #333">#</div>
+          <div class="ghl">TYÖVAIHE / VASTUU</div>
+          <div style="width:38px;min-width:38px;padding:5px 4px;font-size:8px;font-weight:700;color:#fff;text-align:center;border-right:1px solid #333">KESTO</div>
+          <div class="gc2">${whH}</div>
+        </div>
+        ${ganttH}
+      </div>
+      <div class="psec">TEHTÄVÄLISTA</div>
+      <table><thead><tr><th>#</th><th>Työvaihe</th><th>Vastuuhenkilö</th><th>Sijainti</th><th>Alkupäivä</th><th>Loppupäivä</th><th>Kesto</th><th>Hlö</th><th>Kalusto</th><th>Edist.</th></tr></thead><tbody>${tblH}</tbody></table>
+    `;
+
+    const canvas=await html2canvas(el,{scale:1.8,useCORS:true,backgroundColor:'#ffffff',logging:false});
+    el.innerHTML='';el.style.opacity='0';
+
+    const{jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+    const pgW=pdf.internal.pageSize.getWidth(),pgH=pdf.internal.pageSize.getHeight();
+    const imgW=pgW-10,m=5;
+    const imgH=(canvas.height*imgW)/canvas.width;
+    let rem=imgH,srcY=0;
+    while(rem>0){
+      const sh=Math.min(pgH-m*2,rem);
+      const sc=document.createElement('canvas');
+      sc.width=canvas.width;sc.height=Math.round((sh/imgW)*canvas.width);
+      sc.getContext('2d').drawImage(canvas,0,Math.round(srcY*canvas.width/imgW),canvas.width,sc.height,0,0,canvas.width,sc.height);
+      pdf.addImage(sc.toDataURL('image/jpeg',.93),'JPEG',m,m,imgW,sh);
+      rem-=sh;srcY+=sh;if(rem>0)pdf.addPage();
+    }
+    pdf.save(`${site.name.replace(/\s+/g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+  }catch(err){console.error(err);alert('PDF:n luominen epäonnistui.');}
+  document.body.removeChild(loader);
+}
+
+// ── KEYBOARD ──────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.querySelectorAll('.modal-overlay').forEach(m=>m.style.display='none');
+    editingTaskId=editingCheckId=editingNoteId=null;
+  }
+  if(e.key==='n'&&!e.target.matches('input,textarea,select'))openAddTaskModal();
+});
+window.addEventListener('resize',()=>{if(currentView==='gantt')renderGantt();});
+
+// ── INIT ──────────────────────────────────────────────────────
+function renderAll(){
+  renderSiteSwitcher();
+  populateSiteSelects();
+  if(currentView==='dash')renderDash();
+  else if(currentView==='gantt')renderGantt();
+  else if(currentView==='list')renderListView();
+  else if(currentView==='check')renderCheckView();
+  else if(currentView==='notes')renderNotesView();
+}
+
+renderAll();
+renderDash(); // always pre-render dash
+
+// ── PWA SERVICE WORKER ─────────────────────────────────────────
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+// ── NOTIFICATIONS ──────────────────────────────────────────────
+let notifPermission = load('tj_notif_perm', false);
+
+function requestNotifPermission(){
+  if(!('Notification' in window)){return;}
+  Notification.requestPermission().then(p=>{
+    notifPermission = p==='granted';
+    save('tj_notif_perm', notifPermission);
+    if(notifPermission){
+      showToast('✅ Ilmoitukset käytössä! Saat muistutuksia alkavista tehtävistä.');
+      scheduleNotifications();
+    }
+  });
+}
+
+function scheduleNotifications(){
+  if(!notifPermission || Notification.permission !== 'granted') return;
+  try {
+    const td = new Date().toISOString().split('T')[0];
+    const tom = new Date(); tom.setDate(tom.getDate()+1);
+    const tomStr = tom.toISOString().split('T')[0];
+
+    const starting = tasks.filter(t => t.start === tomStr && t.progress < 100);
+    starting.forEach(t => {
+      const site = sites.find(s => s.id === t.siteId);
+      try {
+        new Notification('🏗️ Tehtävä alkaa huomenna', {
+          body: `${t.name}${site ? ' · '+site.name : ''} · Vastuu: ${t.resp}`,
+          icon: 'icon-192.png',
+          badge: 'icon-192.png',
+          tag: 'start-'+t.id
+        });
+      } catch(e){}
+    });
+
+    const overdue = tasks.filter(t => t.end < td && t.progress < 100);
+    if(overdue.length > 0){
+      try {
+        new Notification('⚠️ Myöhässä olevia tehtäviä: '+overdue.length, {
+          body: overdue.slice(0,3).map(t=>t.name).join(', '),
+          icon: 'icon-192.png',
+          tag: 'overdue-summary'
+        });
+      } catch(e){}
+    }
+  } catch(e) { console.warn('Notification error:', e); }
+}
+
+// Run notification check on load
+if(notifPermission && Notification.permission === 'granted'){
+  setTimeout(scheduleNotifications, 2000);
+}
+
+// ── TOAST ──────────────────────────────────────────────────────
+function showToast(msg, duration=3500){
+  let t=document.getElementById('toast');
+  if(!t){
+    t=document.createElement('div');
+    t.id='toast';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1f2638;color:#e8eaf0;padding:10px 18px;border-radius:20px;font-size:12px;font-family:Syne,sans-serif;font-weight:600;z-index:9999;border:1px solid #2a3045;box-shadow:0 4px 20px rgba(0,0,0,.5);transition:opacity .3s;white-space:nowrap';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(t._timer);
+  t._timer=setTimeout(()=>t.style.opacity='0', duration);
+}
+
+// ── AUTO-CHECKLIST GENERATOR ───────────────────────────────────
+const AUTO_CHECKS = {
+  'Turvallisuus': [
+    'Putoamissuojaukset tarkistettu',
+    'Henkilökohtaiset suojavarusteet käytössä (kypärä, liivi, turvakengät)',
+    'Palosammutin saatavilla ja tarkistettu',
+    'Työmaa-alueen kulkureitit merkitty ja vapaat',
+    'Sähkökaapelit ja riskit merkitty',
+    'Ensiapuvälineet saatavilla',
+    'Hätäpoistumistiet merkitty'
+  ],
+  'Laatu': [
+    'Materiaalit tarkistettu ja vastaavat suunnitelmia',
+    'Mittaukset tehty ja dokumentoitu',
+    'Edellinen työvaihe hyväksytty ennen jatkamista',
+    'Piiloon jäävät rakenteet valokuvattu',
+    'Poikkeamat kirjattu'
+  ],
+  'Ympäristö': [
+    'Jätelavat tyhjennetty',
+    'Vaarallinen jäte lajiteltu ja varastoitu oikein',
+    'Pölynhallinta kunnossa',
+    'Työmaa siivottu päivän päätteeksi'
+  ],
+  'Dokumentointi': [
+    'Päiväkirja täytetty',
+    'Valokuvat otettu ja arkistoitu',
+    'Työmäärät kirjattu',
+    'Tilaukset vahvistettu kirjallisesti'
+  ]
+};
+
+function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+
+function autoGenerateChecklist(){
+  if(!sites.length) return;
+  const siteId = activeSiteId;
+  let added = 0;
+  Object.entries(AUTO_CHECKS).forEach(([cat, items])=>{
+    items.forEach(text=>{
+      const exists = checks.some(c => c.siteId===siteId && c.text===text);
+      if(!exists){
+        checks.push({
+          id: genId(),
+          siteId, text, cat, resp:'', done:false, doneAt:null,
+          createdAt: new Date().toISOString()
+        });
+        added++;
+      }
+    });
+  });
+  if(added>0){
+    save('tj_checks', checks);
+    showToast(`✅ Lisätty ${added} tarkistuskohdetta automaattisesti!`);
+    if(currentView==='check') renderCheckView();
+    renderDash();
+  } else {
+    showToast('Kaikki peruslistan kohteet ovat jo olemassa.');
+  }
+}
+
+// ── NOTIFICATION BANNER (first visit) ─────────────────────────
+(function(){
+  if(!notifPermission && 'Notification' in window && Notification.permission === 'default'){
+    setTimeout(()=>{
+      const banner = document.createElement('div');
+      banner.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#1a1f2e;border-top:1px solid #252d42;padding:12px 16px;display:flex;align-items:center;gap:12px;z-index:500;font-family:Syne,sans-serif';
+      banner.innerHTML=`
+        <div style="flex:1;font-size:12px;color:#e8eaf0"><strong style="color:#f5a623">🔔 Salli ilmoitukset</strong><br><span style="color:#8b92a8;font-size:11px">Saat muistutuksen kun tehtävä alkaa tai on myöhässä</span></div>
+        <button onclick="requestNotifPermission();this.parentElement.remove()" style="background:#f5a623;color:#000;border:none;padding:7px 14px;border-radius:6px;font-weight:700;font-family:Syne,sans-serif;font-size:11px;cursor:pointer">Salli</button>
+        <button onclick="this.parentElement.remove()" style="background:transparent;color:#8b92a8;border:1px solid #252d42;padding:7px 12px;border-radius:6px;font-family:Syne,sans-serif;font-size:11px;cursor:pointer">Ei nyt</button>
+      `;
+      document.body.appendChild(banner);
+    }, 3000);
+  }
+})();
+
+// ── INIT ──────────────────────────────────────────────────────</script>
+
+</body>
+</html>

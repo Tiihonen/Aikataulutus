@@ -4,8 +4,8 @@
   "description": "Rakennusalan työnjohtajan työkalu — aikataulut, tarkistuslistat, muistiinpanot",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0d0f18",
-  "theme_color": "#f5a623",
+  "background_color": "#181c28",
+  "theme_color": "#ff9f1c",
   "orientation": "any",
   "lang": "fi",
   "icons": [

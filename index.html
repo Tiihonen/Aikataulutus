@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Työnjohtajan Työkalu</title>
 <meta name="description" content="Rakennusalan työnjohtajan työkalu — aikataulut, tarkistuslistat, muistiinpanot">
-<meta name="theme-color" content="#0d0f18">
+<meta name="theme-color" content="#181c28">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Työnjohtaja">
@@ -17,16 +17,16 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
 :root {
-  --bg:#0d0f18; --surface:#141824; --surface2:#1a1f2e; --surface3:#1f2638;
-  --border:#252d42; --accent:#f5a623; --accent2:#4ecdc4; --accent3:#e74c6f; --accent4:#7c3aed;
-  --text:#e8eaf0; --text2:#8b92a8; --text3:#444e68;
+  --bg:#181c28; --surface:#222636; --surface2:#2a2f45; --surface3:#31374f;
+  --border:#3a4160; --accent:#ff9f1c; --accent2:#2ec4b6; --accent3:#e63946; --accent4:#9b5de5;
+  --text:#f0f2f8; --text2:#a8b0cc; --text3:#606880;
   --hh:56px; --sbw:300px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
 
 /* ── HEADER ── */
-header{background:var(–surface);border-bottom:1px solid var(–border);padding:0 14px;display:flex;align-items:center;height:var(–hh);position:sticky;top:0;z-index:200;gap:10px}
+header{background:var(–surface);border-bottom:2px solid var(–border);padding:0 14px;display:flex;align-items:center;height:var(–hh);position:sticky;top:0;z-index:200;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,.3)}
 .logo{font-size:15px;font-weight:800;color:var(–accent);white-space:nowrap;letter-spacing:-.3px}
 .logo span{color:var(–text3);font-weight:400;font-size:12px}
 
@@ -35,31 +35,30 @@ header{background:var(–surface);border-bottom:1px solid var(–border);padding
 .site-switcher::-webkit-scrollbar{display:none}
 .site-pill{
 padding:5px 12px;border-radius:20px;border:1.5px solid var(–border);
-background:transparent;color:var(–text2);font-family:‘Syne’,sans-serif;
+background:var(–surface2);color:var(–text2);font-family:‘Syne’,sans-serif;
 font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;
 transition:all .15s;touch-action:manipulation;
 }
-.site-pill:hover{border-color:var(–accent);color:var(–accent)}
-.site-pill.active{background:var(–accent);color:#000;border-color:var(–accent)}
-.site-pill.add-site{border-style:dashed;color:var(–text3)}
+.site-pill:hover{border-color:var(–accent);color:var(–accent);background:var(–surface3)}
+.site-pill.active{background:var(–accent);color:#000;border-color:var(–accent);font-weight:800}
+.site-pill.add-site{border-style:dashed;color:var(–text3);background:transparent}
 .site-pill.add-site:hover{border-color:var(–accent2);color:var(–accent2)}
 
 .header-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
-.btn{padding:6px 12px;border-radius:6px;border:none;cursor:pointer;font-family:‘Syne’,sans-serif;font-size:11px;font-weight:700;transition:all .15s;white-space:nowrap;touch-action:manipulation}
-.btn-primary{background:var(–accent);color:#000}
-.btn-primary:hover{background:#ffba45}
-.btn-ghost{background:transparent;color:var(–text2);border:1px solid var(–border)}
-.btn-ghost:hover{border-color:var(–accent);color:var(–accent)}
-.btn-danger{background:transparent;color:var(–accent3);border:1px solid var(–accent3)}
+.btn{padding:7px 13px;border-radius:7px;border:none;cursor:pointer;font-family:‘Syne’,sans-serif;font-size:11px;font-weight:700;transition:all .15s;white-space:nowrap;touch-action:manipulation;letter-spacing:.01em}
+.btn-primary{background:var(–accent);color:#000;box-shadow:0 2px 8px rgba(255,159,28,.35)}
+.btn-primary:hover{background:#ffb340;box-shadow:0 3px 12px rgba(255,159,28,.5)}
+.btn-ghost{background:var(–surface2);color:var(–text2);border:1.5px solid var(–border)}
+.btn-ghost:hover{border-color:var(–accent);color:var(–accent);background:var(–surface3)}
+.btn-danger{background:var(–surface2);color:var(–accent3);border:1.5px solid var(–accent3)}
 .btn-danger:hover{background:var(–accent3);color:#fff}
-.btn-teal{background:transparent;color:var(–accent2);border:1px solid var(–accent2)}
+.btn-teal{background:var(–surface2);color:var(–accent2);border:1.5px solid var(–accent2)}
 .btn-teal:hover{background:var(–accent2);color:#000}
-.btn-sm{padding:4px 8px;font-size:10px}
-.btn-lbl{display:inline}
+.btn-sm{padding:5px 10px;font-size:10px}
 
-/* ── TABS (below header) ── */
-.view-tabs{display:flex;background:var(–surface);border-bottom:1px solid var(–border)}
-.vtab{flex:1;padding:9px 6px;text-align:center;font-size:11px;font-weight:700;color:var(–text3);cursor:pointer;border:none;background:transparent;border-bottom:2px solid transparent;transition:all .15s;font-family:‘Syne’,sans-serif;touch-action:manipulation}
+/* ── TABS ── */
+.view-tabs{display:flex;background:var(–surface);border-bottom:2px solid var(–border)}
+.vtab{flex:1;padding:9px 6px;text-align:center;font-size:11px;font-weight:700;color:var(–text3);cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;transition:all .15s;font-family:‘Syne’,sans-serif;touch-action:manipulation;margin-bottom:-2px}
 .vtab.active{color:var(–accent);border-bottom-color:var(–accent)}
 .vtab .tab-icon{font-size:14px;display:block;margin-bottom:1px}
 
@@ -74,15 +73,15 @@ transition:all .15s;touch-action:manipulation;
 .site-name-display{font-size:14px;font-weight:800;color:var(–text);min-width:60px}
 .nav-weeks{display:flex;align-items:center;gap:3px;margin-left:auto}
 .week-display{font-size:10px;font-family:‘DM Mono’,monospace;color:var(–text2);min-width:110px;text-align:center}
-.zoom-toggle{display:flex;gap:2px;background:var(–bg);border-radius:6px;padding:2px}
+.zoom-toggle{display:flex;gap:2px;background:var(–surface3);border-radius:6px;padding:2px;border:1px solid var(–border)}
 .zoom-btn{padding:3px 8px;border-radius:4px;border:none;background:transparent;color:var(–text2);font-size:10px;font-weight:700;cursor:pointer;font-family:‘Syne’,sans-serif;transition:all .15s}
-.zoom-btn.active{background:var(–accent);color:#000}
+.zoom-btn.active{background:var(–accent);color:#fff}
 .gnr{width:30px;min-width:30px;padding:0 4px;border-right:1px solid var(–border);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:‘DM Mono’,monospace;color:var(–text3);flex-shrink:0}
-.gnr-h{width:30px;min-width:30px;padding:7px 4px;border-right:1px solid var(–border);font-size:8px;font-weight:700;color:var(–text3);letter-spacing:.05em;text-transform:uppercase;text-align:center;background:var(–bg)}
+.gnr-h{width:30px;min-width:30px;padding:7px 4px;border-right:1px solid var(–border);font-size:8px;font-weight:700;color:var(–text2);letter-spacing:.05em;text-transform:uppercase;text-align:center;background:var(–surface3)}
 .gkesto{width:42px;min-width:42px;padding:0 4px;border-right:1px solid var(–border);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:‘DM Mono’,monospace;color:var(–text2);flex-shrink:0}
-.gkesto-h{width:42px;min-width:42px;padding:7px 4px;border-right:1px solid var(–border);font-size:8px;font-weight:700;color:var(–text3);letter-spacing:.05em;text-transform:uppercase;text-align:center;background:var(–bg)}
+.gkesto-h{width:42px;min-width:42px;padding:7px 4px;border-right:1px solid var(–border);font-size:8px;font-weight:700;color:var(–text2);letter-spacing:.05em;text-transform:uppercase;text-align:center;background:var(–surface3)}
 
-.stats-row{display:flex;gap:12px;padding:7px 14px;background:var(–surface2);border-bottom:1px solid var(–border);overflow-x:auto;flex-shrink:0}
+.stats-row{display:flex;gap:12px;padding:7px 14px;background:var(–surface3);border-bottom:1px solid var(–border);overflow-x:auto;flex-shrink:0}
 .stats-row::-webkit-scrollbar{display:none}
 .stat{font-size:10px;color:var(–text2);font-family:‘DM Mono’,monospace;white-space:nowrap}
 .stat strong{color:var(–accent);font-size:12px}
@@ -94,118 +93,119 @@ transition:all .15s;touch-action:manipulation;
 .gantt-wrapper::-webkit-scrollbar-thumb{background:var(–border);border-radius:3px}
 .gantt-container{min-width:100%}
 
-.gantt-header{display:flex;position:sticky;top:0;z-index:10;background:var(–bg);border-bottom:2px solid var(–border)}
-.glh{width:175px;min-width:175px;padding:7px 10px;font-size:9px;font-weight:700;color:var(–text3);letter-spacing:.08em;text-transform:uppercase;border-right:1px solid var(–border);background:var(–bg)}
+.gantt-header{display:flex;position:sticky;top:0;z-index:10;background:var(–surface2);border-bottom:2px solid var(–border)}
+.glh{width:175px;min-width:175px;padding:7px 10px;font-size:9px;font-weight:700;color:var(–text2);letter-spacing:.08em;text-transform:uppercase;border-right:1px solid var(–border);background:var(–surface2)}
 .gcols-h{display:flex}
-.wch{border-right:1px solid var(–border);text-align:center;font-size:9px;font-family:‘DM Mono’,monospace;color:var(–text3);padding:7px 0;flex-shrink:0}
-.wch.tw{color:var(–accent);font-weight:700}
+.wch{border-right:1px solid var(–border);text-align:center;font-size:9px;font-family:‘DM Mono’,monospace;color:var(–text2);padding:7px 0;flex-shrink:0}
+.wch.tw{color:var(–accent);font-weight:700;background:rgba(255,159,28,.1)}
 
-.gantt-row{display:flex;border-bottom:1px solid var(–border);min-height:48px}
+.gantt-row{display:flex;border-bottom:1px solid var(–border);min-height:48px;background:var(–surface)}
+.gantt-row:hover{background:var(–surface2)}
 .grl{width:175px;min-width:175px;padding:6px 10px;border-right:1px solid var(–border);display:flex;flex-direction:column;justify-content:center;cursor:pointer}
 .grl:hover .rn{color:var(–accent)}
 .rn{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rs{font-size:9px;color:var(–text2);font-family:‘DM Mono’,monospace;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gcols{display:flex;flex:1;position:relative;align-items:center}
 .gc{border-right:1px solid var(–border);height:100%;flex-shrink:0}
-.gc.tw{background:rgba(245,166,35,.04)}
-.gbar{position:absolute;height:24px;top:50%;transform:translateY(-50%);border-radius:4px;display:flex;align-items:center;padding:0 6px;font-size:9px;font-weight:700;white-space:nowrap;overflow:hidden;cursor:pointer;z-index:2}
-.today-line{position:absolute;top:0;bottom:0;width:2px;background:var(–accent);z-index:5;pointer-events:none}
-.today-line::after{content:‘NYT’;position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:7px;font-weight:700;font-family:‘DM Mono’,monospace;color:var(–accent);white-space:nowrap;letter-spacing:.1em}
+.gc.tw{background:rgba(255,159,28,.06)}
+.gbar{position:absolute;height:26px;top:50%;transform:translateY(-50%);border-radius:5px;display:flex;align-items:center;padding:0 8px;font-size:10px;font-weight:700;white-space:nowrap;overflow:hidden;cursor:pointer;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.today-line{position:absolute;top:0;bottom:0;width:2px;background:var(–accent);z-index:5;pointer-events:none;box-shadow:0 0 6px rgba(255,159,28,.5)}
+.today-line::after{content:‘NYT’;position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:800;font-family:‘DM Mono’,monospace;color:var(–accent);white-space:nowrap;letter-spacing:.08em;background:var(–bg);padding:0 3px;border-radius:3px}
 .overdue-row .rn{color:var(–accent3) !important}
-.legend{display:flex;gap:8px;padding:7px 14px;background:var(–surface);border-top:1px solid var(–border);flex-wrap:wrap;flex-shrink:0}
-.legend-item{display:flex;align-items:center;gap:4px;font-size:9px;color:var(–text2);font-family:‘DM Mono’,monospace}
-.ldot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.legend{display:flex;gap:8px;padding:8px 14px;background:var(–surface);border-top:1px solid var(–border);flex-wrap:wrap;flex-shrink:0}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(–text2);font-family:‘DM Mono’,monospace}
+.ldot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
 
 /* ── TASK LIST VIEW ── */
 .list-view{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
 .list-view::-webkit-scrollbar{width:4px}
 .list-view::-webkit-scrollbar-thumb{background:var(–border);border-radius:2px}
-.task-card{background:var(–surface2);border:1px solid var(–border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;border-left:3px solid transparent;transition:border-color .15s}
-.task-card:hover{border-color:var(–accent)}
+.task-card{background:var(–surface);border:1.5px solid var(–border);border-radius:10px;padding:12px;margin-bottom:8px;cursor:pointer;border-left:4px solid transparent;transition:all .15s;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.task-card:hover{border-color:var(–accent);transform:translateX(2px);box-shadow:0 3px 14px rgba(0,0,0,.3)}
 .tc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px}
-.tc-name{font-size:13px;font-weight:800}
+.tc-name{font-size:13px;font-weight:800;color:var(–text)}
 .tc-dates{font-size:10px;font-family:‘DM Mono’,monospace;color:var(–text2);white-space:nowrap}
 .tc-meta{font-size:11px;color:var(–text2);margin-bottom:5px}
 .tc-tags{display:flex;gap:4px;flex-wrap:wrap}
-.tag{padding:2px 6px;border-radius:3px;font-size:9px;font-weight:700;font-family:‘DM Mono’,monospace}
-.pb{background:var(–border);height:3px;border-radius:2px;margin-top:6px;overflow:hidden}
-.pbf{height:100%;border-radius:2px;transition:width .3s}
+.tag{padding:3px 7px;border-radius:4px;font-size:9px;font-weight:700;font-family:‘DM Mono’,monospace}
+.pb{background:var(–border);height:4px;border-radius:2px;margin-top:6px;overflow:hidden}
+.pbf{height:100%;border-radius:2px}
 
 /* ── CHECKLIST VIEW ── */
 .checklist-wrap{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
 .check-section{margin-bottom:16px}
-.check-section-title{font-size:11px;font-weight:800;color:var(–text2);text-transform:uppercase;letter-spacing:.07em;padding:8px 12px;background:var(–surface2);border-radius:6px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-.check-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(–surface);border:1px solid var(–border);border-radius:8px;margin-bottom:4px;cursor:pointer;transition:all .15s}
-.check-item:hover{border-color:var(–border)}
+.check-section-title{font-size:11px;font-weight:800;color:var(–text);text-transform:uppercase;letter-spacing:.07em;padding:9px 12px;background:var(–surface2);border:1px solid var(–border);border-radius:7px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.check-item{display:flex;align-items:center;gap:10px;padding:11px 12px;background:var(–surface);border:1.5px solid var(–border);border-radius:8px;margin-bottom:4px;cursor:pointer;transition:all .15s}
+.check-item:hover{border-color:var(–accent2);background:var(–surface2)}
 .check-item.done{opacity:.5}
 .check-item.done .ci-text{text-decoration:line-through;color:var(–text3)}
-.check-box{width:20px;height:20px;border-radius:5px;border:2px solid var(–border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.check-box{width:22px;height:22px;border-radius:6px;border:2px solid var(–border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;background:var(–surface2)}
 .check-item.done .check-box{background:var(–accent2);border-color:var(–accent2)}
-.ci-text{font-size:12px;font-weight:600;flex:1}
-.ci-meta{font-size:10px;color:var(–text2);font-family:‘DM Mono’,monospace}
-.add-check-row{display:flex;gap:8px;padding:8px 0}
+.ci-text{font-size:12px;font-weight:600;color:var(–text);flex:1}
+.ci-meta{font-size:10px;color:var(–text2);font-family:‘DM Mono’,monospace;margin-top:2px}
 
 /* ── NOTES VIEW ── */
 .notes-wrap{flex:1;display:flex;flex-direction:column;padding:12px;gap:10px;overflow-y:auto}
-.note-card{background:var(–surface2);border:1px solid var(–border);border-radius:10px;padding:12px;cursor:pointer;transition:border-color .15s;position:relative}
-.note-card:hover{border-color:var(–accent)}
-.note-card-title{font-size:13px;font-weight:800;margin-bottom:4px}
+.note-card{background:var(–surface);border:1.5px solid var(–border);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s;position:relative;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.note-card:hover{border-color:var(–accent);box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.note-card-title{font-size:13px;font-weight:800;margin-bottom:5px;color:var(–text)}
 .note-card-body{font-size:11px;color:var(–text2);line-height:1.5;white-space:pre-wrap;max-height:80px;overflow:hidden}
-.note-card-meta{font-size:9px;color:var(–text3);font-family:‘DM Mono’,monospace;margin-top:6px}
-.note-card-site{position:absolute;top:10px;right:10px;font-size:9px;padding:2px 6px;border-radius:3px;font-family:‘DM Mono’,monospace;font-weight:700}
+.note-card-meta{font-size:9px;color:var(–text3);font-family:‘DM Mono’,monospace;margin-top:8px}
+.note-card-site{position:absolute;top:10px;right:10px;font-size:9px;padding:2px 7px;border-radius:4px;font-family:‘DM Mono’,monospace;font-weight:700}
 
 /* ── DASHBOARD VIEW ── */
 .dash-wrap{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
-.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.dash-card{background:var(–surface2);border:1px solid var(–border);border-radius:10px;padding:14px}
-.dash-card-title{font-size:10px;font-weight:700;color:var(–text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px}
-.dash-stat{font-size:28px;font-weight:800;color:var(–accent)}
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.dash-card{background:var(–surface);border:1.5px solid var(–border);border-radius:10px;padding:14px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.dash-card-title{font-size:10px;font-weight:700;color:var(–text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.dash-stat{font-size:30px;font-weight:800;color:var(–accent)}
 .dash-stat-sub{font-size:10px;color:var(–text2);margin-top:2px}
-.dash-site-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(–border)}
+.dash-site-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(–border)}
 .dash-site-row:last-child{border-bottom:none}
-.dash-site-name{font-size:12px;font-weight:700}
+.dash-site-name{font-size:12px;font-weight:700;color:var(–text)}
 .dash-site-meta{font-size:10px;color:var(–text2);font-family:‘DM Mono’,monospace}
-.mini-progress{background:var(–border);height:4px;border-radius:2px;margin-top:4px;overflow:hidden;width:100%}
-.mini-progress-fill{height:100%;border-radius:2px;background:var(–accent2)}
-.upcoming-item{padding:8px 0;border-bottom:1px solid var(–border);display:flex;gap:10px;align-items:flex-start}
+.mini-progress{background:var(–border);height:4px;border-radius:2px;margin-top:5px;overflow:hidden;width:100%}
+.mini-progress-fill{height:100%;border-radius:2px}
+.upcoming-item{padding:9px 0;border-bottom:1px solid var(–border);display:flex;gap:10px;align-items:flex-start}
 .upcoming-item:last-child{border-bottom:none}
-.upcoming-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px}
-.upcoming-text{font-size:11px;font-weight:700}
-.upcoming-meta{font-size:9px;color:var(–text2);font-family:‘DM Mono’,monospace}
-.overdue-badge{background:var(–accent3);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px;font-family:‘DM Mono’,monospace}
+.upcoming-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.upcoming-text{font-size:11px;font-weight:700;color:var(–text)}
+.upcoming-meta{font-size:9px;color:var(–text2);font-family:‘DM Mono’,monospace;margin-top:2px}
+.overdue-badge{background:var(–accent3);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;font-family:‘DM Mono’,monospace}
 
 /* ── MODALS ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);animation:fadeIn .15s}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px);animation:fadeIn .15s}
 @media(min-width:600px){.modal-overlay{align-items:center}}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.modal{background:var(–surface);border:1px solid var(–border);border-radius:14px 14px 0 0;width:100%;max-width:520px;max-height:93vh;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:slideUp .2s}
+.modal{background:var(–surface);border:1.5px solid var(–border);border-radius:16px 16px 0 0;width:100%;max-width:520px;max-height:93vh;overflow-y:auto;-webkit-overflow-scrolling:touch;animation:slideUp .2s;box-shadow:0 -8px 40px rgba(0,0,0,.5)}
 @media(min-width:600px){.modal{border-radius:12px;max-height:90vh}}
 @keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
-.mh{padding:16px 18px 12px;border-bottom:1px solid var(–border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(–surface);z-index:1}
-.mh h3{font-size:15px;font-weight:800}
-.mclose{background:none;border:none;color:var(–text2);cursor:pointer;font-size:22px;line-height:1;padding:2px 6px;border-radius:4px}
+.mh{padding:16px 18px 13px;border-bottom:1px solid var(–border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(–surface);z-index:1}
+.mh h3{font-size:16px;font-weight:800;color:var(–text)}
+.mclose{background:var(–surface2);border:none;color:var(–text2);cursor:pointer;font-size:18px;line-height:1;padding:4px 8px;border-radius:6px;transition:all .15s}
+.mclose:hover{background:var(–surface3);color:var(–text)}
 .mbody{padding:16px 18px}
 .mfoot{padding:12px 18px;border-top:1px solid var(–border);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(–surface)}
-.fg{margin-bottom:13px}
-.fl{display:block;font-size:10px;font-weight:700;color:var(–text2);margin-bottom:4px;letter-spacing:.05em;text-transform:uppercase}
-.fi,.fta{width:100%;background:var(–bg);border:1px solid var(–border);border-radius:6px;color:var(–text);padding:9px 11px;font-size:13px;font-family:‘Syne’,sans-serif;transition:border-color .15s;-webkit-appearance:none}
-.fi:focus,.fta:focus{outline:none;border-color:var(–accent)}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:10px;font-weight:700;color:var(–text2);margin-bottom:5px;letter-spacing:.05em;text-transform:uppercase}
+.fi,.fta{width:100%;background:var(–surface2);border:1.5px solid var(–border);border-radius:7px;color:var(–text);padding:10px 12px;font-size:13px;font-family:‘Syne’,sans-serif;transition:border-color .15s;-webkit-appearance:none}
+.fi:focus,.fta:focus{outline:none;border-color:var(–accent);background:var(–surface3)}
 .fta{resize:vertical;min-height:70px}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.5);cursor:pointer}
+input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brightness(1.4);cursor:pointer}
 .cp-row{display:flex;gap:7px;flex-wrap:wrap}
-.cdot{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .1s,border-color .1s;touch-action:manipulation}
-.cdot.sel{border-color:#fff;transform:scale(1.1)}
+.cdot{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform .1s,border-color .1s;touch-action:manipulation}
+.cdot.sel{border-color:#fff;transform:scale(1.15)}
 
 /* ── SITE MODAL ── */
-.site-list-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(–surface2);border:1px solid var(–border);border-radius:8px;margin-bottom:6px}
-.sli-dot{width:12px;height:12px;border-radius:3px;flex-shrink:0}
-.sli-name{flex:1;font-size:13px;font-weight:700}
+.site-list-item{display:flex;align-items:center;gap:10px;padding:11px 12px;background:var(–surface2);border:1.5px solid var(–border);border-radius:8px;margin-bottom:6px}
+.sli-dot{width:14px;height:14px;border-radius:4px;flex-shrink:0}
+.sli-name{flex:1;font-size:13px;font-weight:700;color:var(–text)}
 .sli-meta{font-size:10px;color:var(–text2);font-family:‘DM Mono’,monospace}
 
 /* ── PDF LOADING ── */
-.pdf-loading{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:400;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(–text);font-family:‘DM Mono’,monospace;font-size:12px}
-.spinner{width:38px;height:38px;border:3px solid var(–border);border-top-color:var(–accent);border-radius:50%;animation:spin .8s linear infinite}
+.pdf-loading{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:400;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(–text);font-family:‘DM Mono’,monospace;font-size:12px;backdrop-filter:blur(4px)}
+.spinner{width:42px;height:42px;border:3px solid var(–border);border-top-color:var(–accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── RESPONSIVE ── */
@@ -817,11 +817,11 @@ function renderDash(){
       ${siteSummary.map(s=>`
         <div class="dash-site-row">
           <div style="flex:1">
-            <div style="display:flex;align-items:center;gap:6px"><div class="ldot" style="background:${s.color}"></div><div class="dash-site-name">${s.name}${s.code?` <span style="font-size:9px;color:var(--text2)">(${s.code})</span>`:''}</div>${s.overdue>0?`<span class="overdue-badge">${s.overdue} myöhässä</span>`:''}</div>
-            <div class="dash-site-meta">${s.addr||''} · ${s.tc} tehtävää · ${s.active} käynnissä · ${s.pct}% valmis</div>
+            <div style="display:flex;align-items:center;gap:6px"><div class="ldot" style="background:${s.color}"></div><div class="dash-site-name">${escHtml(s.name)}${s.code?` <span style="font-size:9px;color:var(--text2)">(${escHtml(s.code)})</span>`:''}</div>${s.overdue>0?`<span class="overdue-badge">${s.overdue} myöhässä</span>`:''}</div>
+            <div class="dash-site-meta">${escHtml(s.addr||'')} · ${s.tc} tehtävää · ${s.active} käynnissä · ${s.pct}% valmis</div>
             <div class="mini-progress" style="margin-top:5px"><div class="mini-progress-fill" style="width:${s.pct}%;background:${s.color}"></div></div>
           </div>
-          <button class="btn btn-ghost btn-sm" style="margin-left:10px" onclick="switchSite('${s.id}');switchView('gantt')">→ Aikataulu</button>
+          <button class="btn btn-ghost btn-sm" style="margin-left:10px" onclick="switchSite('${escId(s.id)}');switchView('gantt')">→ Aikataulu</button>
         </div>`).join('')}
     </div>
 
@@ -832,8 +832,8 @@ function renderDash(){
         return`<div class="upcoming-item">
           <div class="upcoming-dot" style="background:${t.color}"></div>
           <div>
-            <div class="upcoming-text">${t.name} ${t.prio==='high'?'🔴':''}</div>
-            <div class="upcoming-meta">${site?site.name:''} · ${t.resp} · alkaa ${fmtD(t.start)}</div>
+            <div class="upcoming-text">${escHtml(t.name)} ${t.prio==='high'?'🔴':''}</div>
+            <div class="upcoming-meta">${site?escHtml(site.name):''} · ${escHtml(t.resp)} · alkaa ${fmtD(t.start)}</div>
           </div>
         </div>`;
       }).join('')}
@@ -944,15 +944,15 @@ function renderGanttWeek(container, myTasks, todayDate, td, site){
       const bVis=bl<totW&&(bl+bw)>0;
       const isOv=task.end<td&&task.progress<100;
       const isHi=task.prio==='high';
-      const bar=bVis?`<div class="gbar" style="left:${bl}px;width:${bw}px;background:${task.color};color:${isLt(task.color)?'#000':'#fff'}${isHi?';box-shadow:0 0 0 2px #e74c6f':''}" onclick="openAddTaskModal('${task.id}')">
+      const bar=bVis?`<div class="gbar" style="left:${bl}px;width:${bw}px;background:${task.color};color:${isLt(task.color)?'#000':'#fff'}${isHi?';box-shadow:0 0 0 2px #e74c6f':''}" onclick="openAddTaskModal('${escId(task.id)}')">
         <div style="position:absolute;left:0;top:0;height:100%;width:${task.progress}%;background:rgba(255,255,255,.25);border-radius:4px;pointer-events:none"></div>
-        <span style="position:relative;z-index:1;overflow:hidden;text-overflow:ellipsis">${isHi?'🔴 ':''}${task.name}</span>
+        <span style="position:relative;z-index:1;overflow:hidden;text-overflow:ellipsis">${isHi?'🔴 ':''}${escHtml(task.name)}</span>
       </div>`:'';
       html+=`<div class="gantt-row${isOv?' overdue-row':''}">
         <div class="gnr">${idx+1}</div>
-        <div class="grl" style="width:155px;min-width:155px" onclick="openAddTaskModal('${task.id}')">
-          <div class="rn" style="color:${isOv?'var(--accent3)':task.color}">${isOv?'⚠ ':''}${task.name}</div>
-          <div class="rs">${task.resp}${task.loc?' · '+task.loc:''}</div>
+        <div class="grl" style="width:155px;min-width:155px" onclick="openAddTaskModal('${escId(task.id)}')">
+          <div class="rn" style="color:${isOv?'var(--accent3)':task.color}">${isOv?'⚠ ':''}${escHtml(task.name)}</div>
+          <div class="rs">${escHtml(task.resp)}${task.loc?' · '+escHtml(task.loc):''}</div>
         </div>
         <div class="gkesto">${daysBetween(task.start,task.end)} pv</div>
         <div class="gcols" style="position:relative">${cells}${bar}${todayPx>=0&&todayPx<=totW?`<div class="today-line" style="left:${todayPx}px"></div>`:''}</div>
@@ -966,8 +966,14 @@ function renderGanttDay(container, myTasks, todayDate, td, site){
   const isMob=window.innerWidth<=768;
   const VD=isMob?14:28;
   if(!viewStartDay){
-    if(myTasks.length){viewStartDay=new Date(myTasks[0].start+'T00:00:00');viewStartDay.setDate(viewStartDay.getDate()-2);}
-    else{viewStartDay=new Date(todayDate);viewStartDay.setDate(viewStartDay.getDate()-3);}
+    if(myTasks.length){
+      const sorted=[...myTasks].sort((a,b)=>a.start.localeCompare(b.start));
+      viewStartDay=new Date(sorted[0].start+'T00:00:00');
+      viewStartDay.setDate(viewStartDay.getDate()-2);
+    } else {
+      viewStartDay=new Date(todayDate);
+      viewStartDay.setDate(viewStartDay.getDate()-3);
+    }
   }
   const days=[]; for(let i=0;i<VD;i++){const d=new Date(viewStartDay);d.setDate(d.getDate()+i);days.push(d);}
   const lastD=days[days.length-1];
@@ -988,7 +994,7 @@ function renderGanttDay(container, myTasks, todayDate, td, site){
   const colsH=days.map(d=>{
     const isT=d.toISOString().split('T')[0]===td;
     const isWe=d.getDay()===0||d.getDay()===6;
-    return`<div class="wch${isT?' tw':''}" style="width:${DAY_PX}px;min-width:${DAY_PX}px;background:${isWe?'rgba(255,255,255,.03)':'transparent'};font-size:8px;padding:4px 0">${d.getDate()}<br><span style="font-size:7px;opacity:.5">${['Su','Ma','Ti','Ke','To','Pe','La'][d.getDay()]}</span></div>`;
+    return`<div class="wch${isT?' tw':''}" style="width:${DAY_PX}px;min-width:${DAY_PX}px;background:${isWe?'#f0f2f5':'transparent'};font-size:8px;padding:4px 0">${d.getDate()}<br><span style="font-size:7px;opacity:.5">${['Su','Ma','Ti','Ke','To','Pe','La'][d.getDay()]}</span></div>`;
   }).join('');
 
   let html=`<div class="gantt-header">
@@ -1016,22 +1022,22 @@ function renderGanttDay(container, myTasks, todayDate, td, site){
       const cells=days.map(d=>{
         const ds=d.toISOString().split('T')[0];
         const isT=ds===td; const isWe=d.getDay()===0||d.getDay()===6;
-        return`<div class="gc${isT?' tw':''}" style="width:${DAY_PX}px;min-width:${DAY_PX}px;background:${isWe?'rgba(255,255,255,.025)':'transparent'}"></div>`;
+        return`<div class="gc${isT?' tw':''}" style="width:${DAY_PX}px;min-width:${DAY_PX}px;background:${isWe?'#f0f2f5':'transparent'}"></div>`;
       }).join('');
 
       const bVis=bl<totW&&(bl+bw)>0;
       const isOv=task.end<td&&task.progress<100;
       const isHi=task.prio==='high';
-      const bar=bVis?`<div class="gbar" style="left:${Math.max(0,bl)}px;width:${bw-(bl<0?-bl:0)}px;background:${task.color};color:${isLt(task.color)?'#000':'#fff'}${isHi?';box-shadow:0 0 0 2px #e74c6f':''}" onclick="openAddTaskModal('${task.id}')">
+      const bar=bVis?`<div class="gbar" style="left:${Math.max(0,bl)}px;width:${bw-(bl<0?-bl:0)}px;background:${task.color};color:${isLt(task.color)?'#000':'#fff'}${isHi?';box-shadow:0 0 0 2px #e74c6f':''}" onclick="openAddTaskModal('${escId(task.id)}')">
         <div style="position:absolute;left:0;top:0;height:100%;width:${task.progress}%;background:rgba(255,255,255,.25);border-radius:4px;pointer-events:none"></div>
-        <span style="position:relative;z-index:1;overflow:hidden;text-overflow:ellipsis">${isHi?'🔴 ':''}${task.name}</span>
+        <span style="position:relative;z-index:1;overflow:hidden;text-overflow:ellipsis">${isHi?'🔴 ':''}${escHtml(task.name)}</span>
       </div>`:'';
 
       html+=`<div class="gantt-row${isOv?' overdue-row':''}">
         <div class="gnr">${idx+1}</div>
-        <div class="grl" style="width:155px;min-width:155px" onclick="openAddTaskModal('${task.id}')">
-          <div class="rn" style="color:${isOv?'var(--accent3)':task.color}">${isOv?'⚠ ':''}${task.name}</div>
-          <div class="rs">${task.resp}${task.loc?' · '+task.loc:''}</div>
+        <div class="grl" style="width:155px;min-width:155px" onclick="openAddTaskModal('${escId(task.id)}')">
+          <div class="rn" style="color:${isOv?'var(--accent3)':task.color}">${isOv?'⚠ ':''}${escHtml(task.name)}</div>
+          <div class="rs">${escHtml(task.resp)}${task.loc?' · '+escHtml(task.loc):''}</div>
         </div>
         <div class="gkesto">${daysBetween(task.start,task.end)} pv</div>
         <div class="gcols" style="position:relative">${cells}${bar}${todayPx>=0&&todayPx<=totW?`<div class="today-line" style="left:${todayPx}px"></div>`:''}</div>
@@ -1077,15 +1083,15 @@ function renderListView(){
   const site=s=>sites.find(x=>x.id===s);
   el.innerHTML=tt.map(t=>{
     const s=site(t.siteId); const isOv=t.end<td&&t.progress<100;
-    return`<div class="task-card" onclick="openAddTaskModal('${t.id}')" style="border-left-color:${t.color}">
+    return`<div class="task-card" onclick="openAddTaskModal('${escId(t.id)}')" style="border-left-color:${t.color}">
       <div class="tc-head">
-        <div class="tc-name">${t.prio==='high'?'🔴 ':''}${t.name}${isOv?' <span style="color:var(--accent3);font-size:10px">⚠ myöhässä</span>':''}</div>
+        <div class="tc-name">${t.prio==='high'?'🔴 ':''}${escHtml(t.name)}${isOv?' <span style="color:var(--accent3);font-size:10px">⚠ myöhässä</span>':''}</div>
         <div class="tc-dates">${fmtD(t.start)} – ${fmtD(t.end)}</div>
       </div>
-      <div class="tc-meta">${s?`<span style="color:${s.color}">${s.name}</span> · `:''} ${t.resp}${t.loc?' · '+t.loc:''}</div>
+      <div class="tc-meta">${s?`<span style="color:${s.color}">${escHtml(s.name)}</span> · `:''} ${escHtml(t.resp)}${t.loc?' · '+escHtml(t.loc):''}</div>
       <div class="tc-tags">
-        ${t.ppl?`<span class="tag" style="background:#4ecdc422;color:#4ecdc4">👷 ${t.ppl}</span>`:''}
-        ${t.equip?`<span class="tag" style="background:#c084fc22;color:#c084fc">🔧 ${t.equip}</span>`:''}
+        ${t.ppl?`<span class="tag" style="background:#4ecdc422;color:#0e9e8e">👷 ${t.ppl}</span>`:''}
+        ${t.equip?`<span class="tag" style="background:#c084fc22;color:#6d28d9">🔧 ${escHtml(t.equip)}</span>`:''}
         <span class="tag" style="background:${t.color}22;color:${t.color}">${t.progress}%</span>
         <span class="tag" style="background:var(--surface3);color:var(--text2)">${daysBetween(t.start,t.end)} pv</span>
       </div>
@@ -1107,14 +1113,14 @@ function renderCheckView(){
     const doneC=items.filter(c=>c.done).length;
     return`<div class="check-section">
       <div class="check-section-title"><span>${catIcon(cat)} ${cat}</span><span style="font-size:10px;font-family:'DM Mono',monospace">${doneC}/${items.length}</span></div>
-      ${items.map(c=>`<div class="check-item${c.done?' done':''}" onclick="toggleCheck('${c.id}')">
+      ${items.map(c=>`<div class="check-item${c.done?' done':''}" onclick="toggleCheck('${escId(c.id)}')">
         <div class="check-box">${c.done?'<span style="font-size:12px;color:#000">✓</span>':''}</div>
         <div style="flex:1">
-          <div class="ci-text">${c.text}</div>
-          ${c.resp?`<div class="ci-meta">👤 ${c.resp}</div>`:''}
+          <div class="ci-text">${escHtml(c.text)}</div>
+          ${c.resp?`<div class="ci-meta">👤 ${escHtml(c.resp)}</div>`:''}
           ${c.done&&c.doneAt?`<div class="ci-meta">✅ ${new Date(c.doneAt).toLocaleDateString('fi-FI')}</div>`:''}
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openAddCheckModal('${c.id}')" style="flex-shrink:0">✏</button>
+        <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();openAddCheckModal('${escId(c.id)}')" style="flex-shrink:0">✏</button>
       </div>`).join('')}
     </div>`;
   }).join('');
@@ -1131,10 +1137,10 @@ function renderNotesView(){
   if(!nn.length){el.innerHTML=`<div style="text-align:center;padding:50px 20px;color:var(--text3)"><div style="font-size:36px;margin-bottom:10px">📝</div><p style="font-size:13px">Ei muistiinpanoja</p></div>`;return;}
   el.innerHTML=nn.map(n=>{
     const s=sites.find(x=>x.id===n.siteId);
-    return`<div class="note-card" onclick="openAddNoteModal('${n.id}')">
-      ${s?`<div class="note-card-site" style="background:${s.color}22;color:${s.color}">${s.name}</div>`:''}
-      <div class="note-card-title">${n.title}</div>
-      <div class="note-card-body">${n.body}</div>
+    return`<div class="note-card" onclick="openAddNoteModal('${escId(n.id)}')">
+      ${s?`<div class="note-card-site" style="background:${s.color}22;color:${s.color}">${escHtml(s.name)}</div>`:''}
+      <div class="note-card-title">${escHtml(n.title)}</div>
+      <div class="note-card-body">${escHtml(n.body)}</div>
       <div class="note-card-meta">Muokattu ${new Date(n.updatedAt).toLocaleDateString('fi-FI',{day:'numeric',month:'long',year:'numeric'})}</div>
     </div>`;
   }).join('');
@@ -1176,7 +1182,7 @@ async function exportPDF(){
   await new Promise(r=>setTimeout(r,80));
   try{
     const today=getMon(new Date());
-    const PW=36,PV=18;
+    const PW=36;
     let minS=myTasks[0].start,maxE=myTasks[0].end;
     myTasks.forEach(t=>{if(t.start<minS)minS=t.start;if(t.end>maxE)maxE=t.end;});
     const pS=addW(getMon(new Date(minS+'T00:00:00')),-1);
@@ -1352,7 +1358,7 @@ function showToast(msg, duration=3500){
   if(!t){
     t=document.createElement('div');
     t.id='toast';
-    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1f2638;color:#e8eaf0;padding:10px 18px;border-radius:20px;font-size:12px;font-family:Syne,sans-serif;font-weight:600;z-index:9999;border:1px solid #2a3045;box-shadow:0 4px 20px rgba(0,0,0,.5);transition:opacity .3s;white-space:nowrap';
+    t.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#1a1f2e;color:#fff;padding:10px 18px;border-radius:20px;font-size:12px;font-family:Syne,sans-serif;font-weight:600;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,.25);transition:opacity .3s;white-space:nowrap';
     document.body.appendChild(t);
   }
   t.textContent=msg; t.style.opacity='1';
@@ -1426,11 +1432,11 @@ function autoGenerateChecklist(){
   if(!notifPermission && 'Notification' in window && Notification.permission === 'default'){
     setTimeout(()=>{
       const banner = document.createElement('div');
-      banner.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#1a1f2e;border-top:1px solid #252d42;padding:12px 16px;display:flex;align-items:center;gap:12px;z-index:500;font-family:Syne,sans-serif';
+      banner.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#222636;border-top:2px solid #3a4160;padding:12px 16px;display:flex;align-items:center;gap:12px;z-index:500;font-family:Syne,sans-serif;box-shadow:0 -4px 20px rgba(0,0,0,.4)';
       banner.innerHTML=`
-        <div style="flex:1;font-size:12px;color:#e8eaf0"><strong style="color:#f5a623">🔔 Salli ilmoitukset</strong><br><span style="color:#8b92a8;font-size:11px">Saat muistutuksen kun tehtävä alkaa tai on myöhässä</span></div>
-        <button onclick="requestNotifPermission();this.parentElement.remove()" style="background:#f5a623;color:#000;border:none;padding:7px 14px;border-radius:6px;font-weight:700;font-family:Syne,sans-serif;font-size:11px;cursor:pointer">Salli</button>
-        <button onclick="this.parentElement.remove()" style="background:transparent;color:#8b92a8;border:1px solid #252d42;padding:7px 12px;border-radius:6px;font-family:Syne,sans-serif;font-size:11px;cursor:pointer">Ei nyt</button>
+        <div style="flex:1;font-size:12px;color:#f0f2f8"><strong style="color:#ff9f1c">🔔 Salli ilmoitukset</strong><br><span style="color:#a8b0cc;font-size:11px">Saat muistutuksen kun tehtävä alkaa tai on myöhässä</span></div>
+        <button onclick="requestNotifPermission();this.parentElement.remove()" style="background:#ff9f1c;color:#000;border:none;padding:7px 14px;border-radius:6px;font-weight:800;font-family:Syne,sans-serif;font-size:11px;cursor:pointer">Salli</button>
+        <button onclick="this.parentElement.remove()" style="background:transparent;color:#a8b0cc;border:1.5px solid #3a4160;padding:7px 12px;border-radius:6px;font-family:Syne,sans-serif;font-size:11px;cursor:pointer">Ei nyt</button>
       `;
       document.body.appendChild(banner);
     }, 3000);

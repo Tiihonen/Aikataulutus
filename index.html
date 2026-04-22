@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="fi">
 <head>
 <meta charset="UTF-8">
@@ -34,10 +33,10 @@ header{background:var(--surface);border-bottom:2px solid var(--border);padding:0
 .site-switcher{display:flex;align-items:center;gap:6px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
 .site-switcher::-webkit-scrollbar{display:none}
 .site-pill{
-padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);
-background:var(--surface2);color:var(--text2);font-family:‘Syne’,sans-serif;
-font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;
-transition:all .15s;touch-action:manipulation;
+  padding:5px 12px;border-radius:20px;border:1.5px solid var(--border);
+  background:var(--surface2);color:var(--text2);font-family:'Syne',sans-serif;
+  font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;
+  transition:all .15s;touch-action:manipulation;
 }
 .site-pill:hover{border-color:var(--accent);color:var(--accent);background:var(--surface3)}
 .site-pill.active{background:var(--accent);color:#000;border-color:var(--accent);font-weight:800}
@@ -45,10 +44,10 @@ transition:all .15s;touch-action:manipulation;
 .site-pill.add-site:hover{border-color:var(--accent2);color:var(--accent2)}
 
 .header-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
-.btn{padding:7px 13px;border-radius:7px;border:none;cursor:pointer;font-family:‘Syne’,sans-serif;font-size:11px;font-weight:700;transition:all .15s;white-space:nowrap;touch-action:manipulation;letter-spacing:.01em}
+.btn{padding:7px 13px;border-radius:7px;border:none;cursor:pointer;font-family:'Syne',sans-serif;font-size:11px;font-weight:700;transition:all .15s;white-space:nowrap;touch-action:manipulation;letter-spacing:.01em}
 .btn-primary{background:var(--accent);color:#000;box-shadow:0 2px 8px rgba(255,159,28,.35)}
 .btn-primary:hover{background:#ffb340;box-shadow:0 3px 12px rgba(255,159,28,.5)}
-.btn-ghost{background:var(--surface2);color:var(--text2);border:1.5px solid var(--border)}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1.5px solid var(--border)}
 .btn-ghost:hover{border-color:var(--accent);color:var(--accent);background:var(--surface3)}
 .btn-danger{background:var(--surface2);color:var(--accent3);border:1.5px solid var(--accent3)}
 .btn-danger:hover{background:var(--accent3);color:#fff}
@@ -58,9 +57,10 @@ transition:all .15s;touch-action:manipulation;
 
 /* ── TABS ── */
 .view-tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border)}
-.vtab{flex:1;padding:9px 6px;text-align:center;font-size:11px;font-weight:700;color:var(--text3);cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;transition:all .15s;font-family:‘Syne’,sans-serif;touch-action:manipulation;margin-bottom:-2px}
+.vtab{flex:1;padding:10px 4px 8px;text-align:center;font-size:10px;font-weight:700;color:var(--text3);cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;transition:all .15s;font-family:'Syne',sans-serif;touch-action:manipulation;margin-bottom:-2px;letter-spacing:.02em}
 .vtab.active{color:var(--accent);border-bottom-color:var(--accent)}
-.vtab .tab-icon{font-size:14px;display:block;margin-bottom:1px}
+.vtab:hover{color:var(--text2)}
+.vtab .tab-icon{font-size:18px;display:block;margin-bottom:3px;line-height:1;color:inherit;font-style:normal}
 
 /* ── LAYOUT ── */
 .app{display:flex;height:calc(100vh - var(--hh) - 42px)}
@@ -72,18 +72,18 @@ transition:all .15s;touch-action:manipulation;
 .gantt-topbar label{font-size:10px;color:var(--text2);font-weight:700;white-space:nowrap}
 .site-name-display{font-size:14px;font-weight:800;color:var(--text);min-width:60px}
 .nav-weeks{display:flex;align-items:center;gap:3px;margin-left:auto}
-.week-display{font-size:10px;font-family:‘DM Mono’,monospace;color:var(--text2);min-width:110px;text-align:center}
+.week-display{font-size:10px;font-family:'DM Mono',monospace;color:var(--text2);min-width:110px;text-align:center}
 .zoom-toggle{display:flex;gap:2px;background:var(--surface3);border-radius:6px;padding:2px;border:1px solid var(--border)}
-.zoom-btn{padding:3px 8px;border-radius:4px;border:none;background:transparent;color:var(--text2);font-size:10px;font-weight:700;cursor:pointer;font-family:‘Syne’,sans-serif;transition:all .15s}
+.zoom-btn{padding:3px 8px;border-radius:4px;border:none;background:transparent;color:var(--text2);font-size:10px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;transition:all .15s}
 .zoom-btn.active{background:var(--accent);color:#fff}
-.gnr{width:30px;min-width:30px;padding:0 4px;border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:‘DM Mono’,monospace;color:var(--text3);flex-shrink:0}
+.gnr{width:30px;min-width:30px;padding:0 4px;border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'DM Mono',monospace;color:var(--text3);flex-shrink:0}
 .gnr-h{width:30px;min-width:30px;padding:7px 4px;border-right:1px solid var(--border);font-size:8px;font-weight:700;color:var(--text2);letter-spacing:.05em;text-transform:uppercase;text-align:center;background:var(--surface3)}
-.gkesto{width:42px;min-width:42px;padding:0 4px;border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:‘DM Mono’,monospace;color:var(--text2);flex-shrink:0}
+.gkesto{width:42px;min-width:42px;padding:0 4px;border-right:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'DM Mono',monospace;color:var(--text2);flex-shrink:0}
 .gkesto-h{width:42px;min-width:42px;padding:7px 4px;border-right:1px solid var(--border);font-size:8px;font-weight:700;color:var(--text2);letter-spacing:.05em;text-transform:uppercase;text-align:center;background:var(--surface3)}
 
 .stats-row{display:flex;gap:12px;padding:7px 14px;background:var(--surface3);border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0}
 .stats-row::-webkit-scrollbar{display:none}
-.stat{font-size:10px;color:var(--text2);font-family:‘DM Mono’,monospace;white-space:nowrap}
+.stat{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;white-space:nowrap}
 .stat strong{color:var(--accent);font-size:12px}
 .stat-warn strong{color:var(--accent3)}
 .stat-ok strong{color:var(--accent2)}
@@ -96,7 +96,7 @@ transition:all .15s;touch-action:manipulation;
 .gantt-header{display:flex;position:sticky;top:0;z-index:10;background:var(--surface2);border-bottom:2px solid var(--border)}
 .glh{width:175px;min-width:175px;padding:7px 10px;font-size:9px;font-weight:700;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;border-right:1px solid var(--border);background:var(--surface2)}
 .gcols-h{display:flex}
-.wch{border-right:1px solid var(--border);text-align:center;font-size:9px;font-family:‘DM Mono’,monospace;color:var(--text2);padding:7px 0;flex-shrink:0}
+.wch{border-right:1px solid var(--border);text-align:center;font-size:9px;font-family:'DM Mono',monospace;color:var(--text2);padding:7px 0;flex-shrink:0}
 .wch.tw{color:var(--accent);font-weight:700;background:rgba(255,159,28,.1)}
 
 .gantt-row{display:flex;border-bottom:1px solid var(--border);min-height:48px;background:var(--surface)}
@@ -104,16 +104,16 @@ transition:all .15s;touch-action:manipulation;
 .grl{width:175px;min-width:175px;padding:6px 10px;border-right:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;cursor:pointer}
 .grl:hover .rn{color:var(--accent)}
 .rn{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rs{font-size:9px;color:var(--text2);font-family:‘DM Mono’,monospace;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rs{font-size:9px;color:var(--text2);font-family:'DM Mono',monospace;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gcols{display:flex;flex:1;position:relative;align-items:center}
 .gc{border-right:1px solid var(--border);height:100%;flex-shrink:0}
 .gc.tw{background:rgba(255,159,28,.06)}
 .gbar{position:absolute;height:26px;top:50%;transform:translateY(-50%);border-radius:5px;display:flex;align-items:center;padding:0 8px;font-size:10px;font-weight:700;white-space:nowrap;overflow:hidden;cursor:pointer;z-index:2;box-shadow:0 2px 6px rgba(0,0,0,.3)}
 .today-line{position:absolute;top:0;bottom:0;width:2px;background:var(--accent);z-index:5;pointer-events:none;box-shadow:0 0 6px rgba(255,159,28,.5)}
-.today-line::after{content:‘NYT’;position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:800;font-family:‘DM Mono’,monospace;color:var(--accent);white-space:nowrap;letter-spacing:.08em;background:var(--bg);padding:0 3px;border-radius:3px}
+.today-line::after{content:'NYT';position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:8px;font-weight:800;font-family:'DM Mono',monospace;color:var(--accent);white-space:nowrap;letter-spacing:.08em;background:var(--bg);padding:0 3px;border-radius:3px}
 .overdue-row .rn{color:var(--accent3) !important}
 .legend{display:flex;gap:8px;padding:8px 14px;background:var(--surface);border-top:1px solid var(--border);flex-wrap:wrap;flex-shrink:0}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);font-family:‘DM Mono’,monospace}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--text2);font-family:'DM Mono',monospace}
 .ldot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
 
 /* ── TASK LIST VIEW ── */
@@ -124,10 +124,10 @@ transition:all .15s;touch-action:manipulation;
 .task-card:hover{border-color:var(--accent);transform:translateX(2px);box-shadow:0 3px 14px rgba(0,0,0,.3)}
 .tc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:4px}
 .tc-name{font-size:13px;font-weight:800;color:var(--text)}
-.tc-dates{font-size:10px;font-family:‘DM Mono’,monospace;color:var(--text2);white-space:nowrap}
+.tc-dates{font-size:10px;font-family:'DM Mono',monospace;color:var(--text2);white-space:nowrap}
 .tc-meta{font-size:11px;color:var(--text2);margin-bottom:5px}
 .tc-tags{display:flex;gap:4px;flex-wrap:wrap}
-.tag{padding:3px 7px;border-radius:4px;font-size:9px;font-weight:700;font-family:‘DM Mono’,monospace}
+.tag{padding:3px 7px;border-radius:4px;font-size:9px;font-weight:700;font-family:'DM Mono',monospace}
 .pb{background:var(--border);height:4px;border-radius:2px;margin-top:6px;overflow:hidden}
 .pbf{height:100%;border-radius:2px}
 
@@ -142,7 +142,7 @@ transition:all .15s;touch-action:manipulation;
 .check-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;background:var(--surface2)}
 .check-item.done .check-box{background:var(--accent2);border-color:var(--accent2)}
 .ci-text{font-size:12px;font-weight:600;color:var(--text);flex:1}
-.ci-meta{font-size:10px;color:var(--text2);font-family:‘DM Mono’,monospace;margin-top:2px}
+.ci-meta{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;margin-top:2px}
 
 /* ── NOTES VIEW ── */
 .notes-wrap{flex:1;display:flex;flex-direction:column;padding:12px;gap:10px;overflow-y:auto}
@@ -150,28 +150,28 @@ transition:all .15s;touch-action:manipulation;
 .note-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(0,0,0,.3)}
 .note-card-title{font-size:13px;font-weight:800;margin-bottom:5px;color:var(--text)}
 .note-card-body{font-size:11px;color:var(--text2);line-height:1.5;white-space:pre-wrap;max-height:80px;overflow:hidden}
-.note-card-meta{font-size:9px;color:var(--text3);font-family:‘DM Mono’,monospace;margin-top:8px}
-.note-card-site{position:absolute;top:10px;right:10px;font-size:9px;padding:2px 7px;border-radius:4px;font-family:‘DM Mono’,monospace;font-weight:700}
+.note-card-meta{font-size:9px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:8px}
+.note-card-site{position:absolute;top:10px;right:10px;font-size:9px;padding:2px 7px;border-radius:4px;font-family:'DM Mono',monospace;font-weight:700}
 
 /* ── DASHBOARD VIEW ── */
 .dash-wrap{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
 .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.dash-card{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:14px;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.dash-card{background:var(--surface);border:1.5px solid var(--border);border-radius:10px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);border-top:3px solid var(--border)}
 .dash-card-title{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
-.dash-stat{font-size:30px;font-weight:800;color:var(--accent)}
+.dash-stat{font-size:32px;font-weight:800;color:var(--accent);font-family:'Syne','Arial',sans-serif;line-height:1.1}
 .dash-stat-sub{font-size:10px;color:var(--text2);margin-top:2px}
 .dash-site-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
 .dash-site-row:last-child{border-bottom:none}
 .dash-site-name{font-size:12px;font-weight:700;color:var(--text)}
-.dash-site-meta{font-size:10px;color:var(--text2);font-family:‘DM Mono’,monospace}
+.dash-site-meta{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace}
 .mini-progress{background:var(--border);height:4px;border-radius:2px;margin-top:5px;overflow:hidden;width:100%}
 .mini-progress-fill{height:100%;border-radius:2px}
 .upcoming-item{padding:9px 0;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start}
 .upcoming-item:last-child{border-bottom:none}
 .upcoming-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;margin-top:3px}
 .upcoming-text{font-size:11px;font-weight:700;color:var(--text)}
-.upcoming-meta{font-size:9px;color:var(--text2);font-family:‘DM Mono’,monospace;margin-top:2px}
-.overdue-badge{background:var(--accent3);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;font-family:‘DM Mono’,monospace}
+.upcoming-meta{font-size:9px;color:var(--text2);font-family:'DM Mono',monospace;margin-top:2px}
+.overdue-badge{background:var(--accent3);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;font-family:'DM Mono',monospace}
 
 /* ── MODALS ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px);animation:fadeIn .15s}
@@ -188,11 +188,11 @@ transition:all .15s;touch-action:manipulation;
 .mfoot{padding:12px 18px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;position:sticky;bottom:0;background:var(--surface)}
 .fg{margin-bottom:14px}
 .fl{display:block;font-size:10px;font-weight:700;color:var(--text2);margin-bottom:5px;letter-spacing:.05em;text-transform:uppercase}
-.fi,.fta{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--text);padding:10px 12px;font-size:13px;font-family:‘Syne’,sans-serif;transition:border-color .15s;appearance:none;-webkit-appearance:none}
+.fi,.fta{width:100%;background:var(--surface2);border:1.5px solid var(--border);border-radius:7px;color:var(--text);padding:10px 12px;font-size:13px;font-family:'Syne',sans-serif;transition:border-color .15s;-webkit-appearance:none}
 .fi:focus,.fta:focus{outline:none;border-color:var(--accent);background:var(--surface3)}
 .fta{resize:vertical;min-height:70px}
 .frow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brightness(1.4);cursor:pointer}
+input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.7) brightness(1.4);cursor:pointer}
 .cp-row{display:flex;gap:7px;flex-wrap:wrap}
 .cdot{width:30px;height:30px;border-radius:50%;cursor:pointer;border:3px solid transparent;transition:transform .1s,border-color .1s;touch-action:manipulation}
 .cdot.sel{border-color:#fff;transform:scale(1.15)}
@@ -201,26 +201,26 @@ input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brig
 .site-list-item{display:flex;align-items:center;gap:10px;padding:11px 12px;background:var(--surface2);border:1.5px solid var(--border);border-radius:8px;margin-bottom:6px}
 .sli-dot{width:14px;height:14px;border-radius:4px;flex-shrink:0}
 .sli-name{flex:1;font-size:13px;font-weight:700;color:var(--text)}
-.sli-meta{font-size:10px;color:var(--text2);font-family:‘DM Mono’,monospace}
+.sli-meta{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace}
 
 /* ── PDF LOADING ── */
-.pdf-loading{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:400;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--text);font-family:‘DM Mono’,monospace;font-size:12px;backdrop-filter:blur(4px)}
+.pdf-loading{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:400;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;backdrop-filter:blur(4px)}
 .spinner{width:42px;height:42px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── RESPONSIVE ── */
 @media(max-width:768px){
-.app{height:calc(100vh - var(--hh) - 42px)}
-.btn-lbl{display:none}
-.logo span{display:none}
-.glh,.grl{width:130px;min-width:130px}
-.week-display{min-width:80px;font-size:9px}
-.dash-grid{grid-template-columns:1fr 1fr}
+  .app{height:calc(100vh - var(--hh) - 42px)}
+  .btn-lbl{display:none}
+  .logo span{display:none}
+  .glh,.grl{width:130px;min-width:130px}
+  .week-display{min-width:80px;font-size:9px}
+  .dash-grid{grid-template-columns:1fr 1fr}
 }
 @media(max-width:420px){
-.site-pill{padding:4px 9px;font-size:10px}
-.nav-weeks .week-display{display:none}
-.dash-grid{grid-template-columns:1fr}
+  .site-pill{padding:4px 9px;font-size:10px}
+  .nav-weeks .week-display{display:none}
+  .dash-grid{grid-template-columns:1fr}
 }
 
 /* ── PDF TEMPLATE ── */
@@ -248,12 +248,10 @@ input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brig
 #pdf-cap .gb{position:absolute;height:13px;top:50%;transform:translateY(-50%);border-radius:3px;font-size:8px;font-weight:700;display:flex;align-items:center;padding:0 4px;overflow:hidden}
 #pdf-cap .tvl{position:absolute;top:0;bottom:0;width:1px;background:#f5a623;z-index:5}
 </style>
-
 </head>
 <body>
 
 <!-- HEADER -->
-
 <header>
   <div class="logo">TYÖNJOHTAJA <span>/ pro</span></div>
   <div class="site-switcher" id="site-switcher"></div>
@@ -266,25 +264,22 @@ input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brig
 </header>
 
 <!-- VIEW TABS -->
-
 <div class="view-tabs">
-  <button class="vtab active" id="vtab-dash" onclick="switchView('dash')"><span class="tab-icon">📊</span>Katsaus</button>
-  <button class="vtab" id="vtab-gantt" onclick="switchView('gantt')"><span class="tab-icon">📅</span>Aikataulu</button>
-  <button class="vtab" id="vtab-list" onclick="switchView('list')"><span class="tab-icon">📋</span>Tehtävät</button>
-  <button class="vtab" id="vtab-check" onclick="switchView('check')"><span class="tab-icon">✅</span>Tarkistus</button>
-  <button class="vtab" id="vtab-notes" onclick="switchView('notes')"><span class="tab-icon">📝</span>Muistiinpanot</button>
+  <button class="vtab active" id="vtab-dash" onclick="switchView('dash')"><span class="tab-icon">▦</span>Katsaus</button>
+  <button class="vtab" id="vtab-gantt" onclick="switchView('gantt')"><span class="tab-icon">▬</span>Aikataulu</button>
+  <button class="vtab" id="vtab-list" onclick="switchView('list')"><span class="tab-icon">≡</span>Tehtävät</button>
+  <button class="vtab" id="vtab-check" onclick="switchView('check')"><span class="tab-icon">✓</span>Tarkistus</button>
+  <button class="vtab" id="vtab-notes" onclick="switchView('notes')"><span class="tab-icon">✎</span>Muistiinpanot</button>
 </div>
 
 <div class="app">
 
   <!-- DASHBOARD -->
-
   <div class="view-panel active" id="panel-dash">
     <div class="dash-wrap" id="dash-wrap"></div>
   </div>
 
   <!-- GANTT -->
-
   <div class="view-panel" id="panel-gantt">
     <div class="gantt-topbar">
       <div class="site-name-display" id="gantt-site-name"></div>
@@ -307,7 +302,6 @@ input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brig
   </div>
 
   <!-- TASK LIST -->
-
   <div class="view-panel" id="panel-list">
     <div style="padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-shrink:0">
       <select id="list-filter-site" class="fi" style="flex:1;max-width:200px;padding:5px 8px;font-size:11px" onchange="renderListView()">
@@ -326,7 +320,6 @@ input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brig
   </div>
 
   <!-- CHECKLIST -->
-
   <div class="view-panel" id="panel-check">
     <div style="padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-shrink:0">
       <select id="check-filter-site" class="fi" style="flex:1;max-width:200px;padding:5px 8px;font-size:11px" onchange="renderCheckView()">
@@ -339,7 +332,6 @@ input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brig
   </div>
 
   <!-- NOTES -->
-
   <div class="view-panel" id="panel-notes">
     <div style="padding:10px 12px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-shrink:0">
       <select id="notes-filter-site" class="fi" style="flex:1;max-width:200px;padding:5px 8px;font-size:11px" onchange="renderNotesView()">
@@ -353,7 +345,6 @@ input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brig
 </div><!-- .app -->
 
 <!-- TASK MODAL -->
-
 <div class="modal-overlay" id="task-modal" style="display:none" onclick="if(event.target===this)closeTaskModal()">
 <div class="modal">
   <div class="mh"><h3 id="task-modal-title">Lisää tehtävä</h3><button class="mclose" onclick="closeTaskModal()">×</button></div>
@@ -405,7 +396,6 @@ input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brig
 </div>
 
 <!-- SITE MODAL -->
-
 <div class="modal-overlay" id="site-modal" style="display:none" onclick="if(event.target===this)closeSiteModal()">
 <div class="modal">
   <div class="mh"><h3>Työmaat</h3><button class="mclose" onclick="closeSiteModal()">×</button></div>
@@ -434,7 +424,6 @@ input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brig
 </div>
 
 <!-- CHECKLIST MODAL -->
-
 <div class="modal-overlay" id="check-modal" style="display:none" onclick="if(event.target===this)closeCheckModal()">
 <div class="modal">
   <div class="mh"><h3 id="check-modal-title">Lisää tarkistuskohde</h3><button class="mclose" onclick="closeCheckModal()">×</button></div>
@@ -463,7 +452,6 @@ input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brig
 </div>
 
 <!-- NOTE MODAL -->
-
 <div class="modal-overlay" id="note-modal" style="display:none" onclick="if(event.target===this)closeNoteModal()">
 <div class="modal">
   <div class="mh"><h3 id="note-modal-title">Muistiinpano</h3><button class="mclose" onclick="closeNoteModal()">×</button></div>
@@ -481,7 +469,6 @@ input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brig
 </div>
 
 <!-- PDF CAPTURE -->
-
 <div id="pdf-cap" style="position:fixed;left:-9999px;top:0;pointer-events:none;opacity:0"></div>
 
 <script>
@@ -1444,6 +1431,5 @@ function autoGenerateChecklist(){
 })();
 
 // ── INIT ──────────────────────────────────────────────────────</script>
-
 </body>
 </html>

@@ -25,6 +25,17 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden}
 
+/* iOS Safari fix - prevent default blue button colors */
+button{
+-webkit-appearance:none !important;
+appearance:none !important;
+background:none;
+font-family:inherit;
+color:inherit;
+-webkit-text-fill-color:currentColor;
+}
+button:focus{outline:none}
+
 /* ── HEADER ── */
 header{background:var(–surface);border-bottom:2px solid var(–border);padding:0 14px;display:flex;align-items:center;height:var(–hh);position:sticky;top:0;z-index:200;gap:10px;box-shadow:0 2px 12px rgba(0,0,0,.3)}
 .logo{font-size:15px;font-weight:800;color:var(–accent);white-space:nowrap;letter-spacing:-.3px}
@@ -46,23 +57,23 @@ transition:all .15s;touch-action:manipulation;
 
 .header-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
 .btn{padding:7px 13px;border-radius:7px;border:none;cursor:pointer;font-family:‘Syne’,sans-serif;font-size:11px;font-weight:700;transition:all .15s;white-space:nowrap;touch-action:manipulation;letter-spacing:.01em;-webkit-appearance:none;appearance:none}
-.btn-primary{background:var(–accent) !important;color:#000 !important;box-shadow:0 2px 8px rgba(255,159,28,.35)}
+.btn-primary{background:var(–accent) !important;color:#000 !important;-webkit-text-fill-color:#000 !important;box-shadow:0 2px 8px rgba(255,159,28,.35)}
 .btn-primary:hover{background:#ffb340 !important;box-shadow:0 3px 12px rgba(255,159,28,.5)}
-.btn-ghost{background:var(–surface2) !important;color:var(–text) !important;border:1.5px solid var(–border) !important}
-.btn-ghost:hover{border-color:var(–accent) !important;color:var(–accent) !important;background:var(–surface3) !important}
-.btn-danger{background:var(–surface2) !important;color:var(–accent3) !important;border:1.5px solid var(–accent3) !important}
-.btn-danger:hover{background:var(–accent3) !important;color:#fff !important}
-.btn-teal{background:var(–surface2) !important;color:var(–accent2) !important;border:1.5px solid var(–accent2) !important}
-.btn-teal:hover{background:var(–accent2) !important;color:#000 !important}
+.btn-ghost{background:var(–surface2) !important;color:var(–text) !important;-webkit-text-fill-color:var(–text) !important;border:1.5px solid var(–border) !important}
+.btn-ghost:hover{border-color:var(–accent) !important;color:var(–accent) !important;-webkit-text-fill-color:var(–accent) !important;background:var(–surface3) !important}
+.btn-danger{background:var(–surface2) !important;color:var(–accent3) !important;-webkit-text-fill-color:var(–accent3) !important;border:1.5px solid var(–accent3) !important}
+.btn-danger:hover{background:var(–accent3) !important;color:#fff !important;-webkit-text-fill-color:#fff !important}
+.btn-teal{background:var(–surface2) !important;color:var(–accent2) !important;-webkit-text-fill-color:var(–accent2) !important;border:1.5px solid var(–accent2) !important}
+.btn-teal:hover{background:var(–accent2) !important;color:#000 !important;-webkit-text-fill-color:#000 !important}
 .btn-sm{padding:5px 10px;font-size:10px}
 
 /* ── TABS ── */
 .view-tabs{display:flex;background:var(–surface);border-bottom:2px solid var(–border)}
-.vtab{flex:1;padding:10px 4px 8px;text-align:center;font-size:10px;font-weight:700;color:var(–text3) !important;cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;transition:all .15s;font-family:‘Syne’,sans-serif;touch-action:manipulation;margin-bottom:-2px;letter-spacing:.02em;text-decoration:none;-webkit-appearance:none;appearance:none}
-.vtab.active{color:var(–accent) !important;border-bottom-color:var(–accent)}
-.vtab.active .tab-icon{color:var(–accent) !important}
-.vtab:hover{color:var(–text2) !important}
-.vtab .tab-icon{font-size:18px;display:block;margin-bottom:3px;line-height:1;color:var(–text3) !important;font-style:normal}
+.vtab{flex:1;padding:10px 4px 8px;text-align:center;font-size:10px;font-weight:700;color:var(–text3) !important;-webkit-text-fill-color:var(–text3) !important;cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;transition:all .15s;font-family:‘Syne’,sans-serif;touch-action:manipulation;margin-bottom:-2px;letter-spacing:.02em;text-decoration:none;-webkit-appearance:none;appearance:none}
+.vtab.active{color:var(–accent) !important;-webkit-text-fill-color:var(–accent) !important;border-bottom-color:var(–accent)}
+.vtab.active .tab-icon{color:var(–accent) !important;-webkit-text-fill-color:var(–accent) !important}
+.vtab:hover{color:var(–text2) !important;-webkit-text-fill-color:var(–text2) !important}
+.vtab .tab-icon{font-size:18px;display:block;margin-bottom:3px;line-height:1;color:var(–text3) !important;-webkit-text-fill-color:var(–text3) !important;font-style:normal}
 
 /* ── LAYOUT ── */
 .app{display:flex;height:calc(100vh - var(–hh) - 42px)}

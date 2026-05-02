@@ -59,8 +59,8 @@ transition:all .15s;touch-action:manipulation;
 .btn{padding:7px 13px;border-radius:7px;border:none;cursor:pointer;font-family:‘Syne’,sans-serif;font-size:11px;font-weight:700;transition:all .15s;white-space:nowrap;touch-action:manipulation;letter-spacing:.01em;-webkit-appearance:none;appearance:none}
 .btn-primary{background:var(–accent) !important;color:#000 !important;-webkit-text-fill-color:#000 !important;box-shadow:0 2px 8px rgba(255,159,28,.35)}
 .btn-primary:hover{background:#ffb340 !important;box-shadow:0 3px 12px rgba(255,159,28,.5)}
-.btn-ghost{background:var(–surface2) !important;color:var(–text) !important;-webkit-text-fill-color:var(–text) !important;border:1.5px solid var(–border) !important}
-.btn-ghost:hover{border-color:var(–accent) !important;color:var(–accent) !important;-webkit-text-fill-color:var(–accent) !important;background:var(–surface3) !important}
+.btn-ghost{background:var(–surface3) !important;color:var(–text) !important;-webkit-text-fill-color:var(–text) !important;border:1.5px solid var(–border) !important}
+.btn-ghost:hover{border-color:var(–accent) !important;color:var(–accent) !important;-webkit-text-fill-color:var(–accent) !important;background:var(–surface2) !important}
 .btn-danger{background:var(–surface2) !important;color:var(–accent3) !important;-webkit-text-fill-color:var(–accent3) !important;border:1.5px solid var(–accent3) !important}
 .btn-danger:hover{background:var(–accent3) !important;color:#fff !important;-webkit-text-fill-color:#fff !important}
 .btn-teal{background:var(–surface2) !important;color:var(–accent2) !important;-webkit-text-fill-color:var(–accent2) !important;border:1.5px solid var(–accent2) !important}
@@ -256,8 +256,9 @@ input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brig
 .vtab{font-size:9px;padding:8px 2px 6px}
 .vtab .tab-icon{font-size:16px}
 header{padding:0 10px;gap:6px}
-.btn{padding:6px 10px}
-.btn-sm{padding:5px 8px}
+/* Larger header buttons on mobile for readability */
+header .btn{padding:8px 12px;font-size:13px;font-weight:800;min-width:44px;min-height:36px}
+header .btn-sm{padding:8px 12px;font-size:12px;font-weight:700}
 .view-tabs{overflow-x:auto;scrollbar-width:none}
 .view-tabs::-webkit-scrollbar{display:none}
 }
@@ -306,10 +307,10 @@ header{padding:0 10px;gap:6px}
   <div class="logo">TYÖNJOHTAJA <span>/ pro</span></div>
   <div class="site-switcher" id="site-switcher"></div>
   <div class="header-right">
-    <button class="btn btn-ghost btn-sm" onclick="openSiteModal()">⚙ <span class="btn-lbl">Työmaat</span></button>
-    <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ <span class="btn-lbl">CSV</span></button>
-    <button class="btn btn-ghost btn-sm" onclick="exportPDF()">📄 <span class="btn-lbl">PDF</span></button>
-    <button class="btn btn-primary" onclick="openAddTaskModal()">+ <span class="btn-lbl">Lisää</span></button>
+    <button class="btn btn-ghost btn-sm" onclick="openSiteModal()" title="Työmaat">⚙<span class="btn-lbl"> Työmaat</span></button>
+    <button class="btn btn-ghost btn-sm" onclick="exportCSV()" title="Vie CSV">CSV<span class="btn-lbl"></span></button>
+    <button class="btn btn-ghost btn-sm" onclick="exportPDF()" title="Vie PDF">PDF<span class="btn-lbl"></span></button>
+    <button class="btn btn-primary" onclick="openAddTaskModal()" title="Lisää tehtävä">+<span class="btn-lbl"> Lisää</span></button>
   </div>
 </header>
 

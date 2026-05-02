@@ -175,6 +175,11 @@ transition:all .15s;touch-action:manipulation;
 .dash-active-site-name{font-size:18px;font-weight:800;color:var(–text);display:flex;align-items:center;gap:8px}
 .dash-active-site-name .ldot{width:14px;height:14px;border-radius:4px}
 .dash-site-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+
+@media(min-width:769px){
+/* On desktop, site pills show in header — hide duplicate in dashboard */
+.dash-site-pills{display:none}
+}
 .dash-card-title{font-size:10px;font-weight:700;color:var(–text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
 .dash-stat{font-size:32px;font-weight:800;color:var(–accent);font-family:‘Syne’,‘Arial’,sans-serif;line-height:1.1}
 .dash-stat-sub{font-size:10px;color:var(–text2);margin-top:2px}
@@ -584,6 +589,7 @@ if(!activeSiteId||!sites.find(s=>s.id===activeSiteId)){
 }
 
 let editingTaskId=null, editingCheckId=null, editingNoteId=null, editingSiteId=null;
+let editTaskWorkerIds = []; // worker ids selected for the task currently being edited
 let viewStartWeek=null;
 const WPX=70;
 let currentView='dash';
@@ -839,7 +845,6 @@ function deleteNote(){
 }
 
 // ── WORKERS MANAGEMENT ─────────────────────────────────────────
-let editTaskWorkerIds = []; // worker ids selected for the task currently being edited
 
 function openWorkersModal(){
   renderWorkersList();

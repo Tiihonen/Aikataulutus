@@ -45,23 +45,24 @@ transition:all .15s;touch-action:manipulation;
 .site-pill.add-site:hover{border-color:var(–accent2);color:var(–accent2)}
 
 .header-right{display:flex;gap:6px;align-items:center;flex-shrink:0}
-.btn{padding:7px 13px;border-radius:7px;border:none;cursor:pointer;font-family:‘Syne’,sans-serif;font-size:11px;font-weight:700;transition:all .15s;white-space:nowrap;touch-action:manipulation;letter-spacing:.01em}
-.btn-primary{background:var(–accent);color:#000;box-shadow:0 2px 8px rgba(255,159,28,.35)}
-.btn-primary:hover{background:#ffb340;box-shadow:0 3px 12px rgba(255,159,28,.5)}
-.btn-ghost{background:var(–surface2);color:var(–text);border:1.5px solid var(–border)}
-.btn-ghost:hover{border-color:var(–accent);color:var(–accent);background:var(–surface3)}
-.btn-danger{background:var(–surface2);color:var(–accent3);border:1.5px solid var(–accent3)}
-.btn-danger:hover{background:var(–accent3);color:#fff}
-.btn-teal{background:var(–surface2);color:var(–accent2);border:1.5px solid var(–accent2)}
-.btn-teal:hover{background:var(–accent2);color:#000}
+.btn{padding:7px 13px;border-radius:7px;border:none;cursor:pointer;font-family:‘Syne’,sans-serif;font-size:11px;font-weight:700;transition:all .15s;white-space:nowrap;touch-action:manipulation;letter-spacing:.01em;-webkit-appearance:none;appearance:none}
+.btn-primary{background:var(–accent) !important;color:#000 !important;box-shadow:0 2px 8px rgba(255,159,28,.35)}
+.btn-primary:hover{background:#ffb340 !important;box-shadow:0 3px 12px rgba(255,159,28,.5)}
+.btn-ghost{background:var(–surface2) !important;color:var(–text) !important;border:1.5px solid var(–border) !important}
+.btn-ghost:hover{border-color:var(–accent) !important;color:var(–accent) !important;background:var(–surface3) !important}
+.btn-danger{background:var(–surface2) !important;color:var(–accent3) !important;border:1.5px solid var(–accent3) !important}
+.btn-danger:hover{background:var(–accent3) !important;color:#fff !important}
+.btn-teal{background:var(–surface2) !important;color:var(–accent2) !important;border:1.5px solid var(–accent2) !important}
+.btn-teal:hover{background:var(–accent2) !important;color:#000 !important}
 .btn-sm{padding:5px 10px;font-size:10px}
 
 /* ── TABS ── */
 .view-tabs{display:flex;background:var(–surface);border-bottom:2px solid var(–border)}
-.vtab{flex:1;padding:10px 4px 8px;text-align:center;font-size:10px;font-weight:700;color:var(–text3);cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;transition:all .15s;font-family:‘Syne’,sans-serif;touch-action:manipulation;margin-bottom:-2px;letter-spacing:.02em}
-.vtab.active{color:var(–accent);border-bottom-color:var(–accent)}
-.vtab:hover{color:var(–text2)}
-.vtab .tab-icon{font-size:18px;display:block;margin-bottom:3px;line-height:1;color:inherit;font-style:normal}
+.vtab{flex:1;padding:10px 4px 8px;text-align:center;font-size:10px;font-weight:700;color:var(–text3) !important;cursor:pointer;border:none;background:transparent;border-bottom:3px solid transparent;transition:all .15s;font-family:‘Syne’,sans-serif;touch-action:manipulation;margin-bottom:-2px;letter-spacing:.02em;text-decoration:none;-webkit-appearance:none;appearance:none}
+.vtab.active{color:var(–accent) !important;border-bottom-color:var(–accent)}
+.vtab.active .tab-icon{color:var(–accent) !important}
+.vtab:hover{color:var(–text2) !important}
+.vtab .tab-icon{font-size:18px;display:block;margin-bottom:3px;line-height:1;color:var(–text3) !important;font-style:normal}
 
 /* ── LAYOUT ── */
 .app{display:flex;height:calc(100vh - var(–hh) - 42px)}
@@ -158,6 +159,11 @@ transition:all .15s;touch-action:manipulation;
 .dash-wrap{flex:1;overflow-y:auto;padding:12px;-webkit-overflow-scrolling:touch}
 .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .dash-card{background:var(–surface);border:1.5px solid var(–border);border-radius:10px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.3);border-top:3px solid var(–border)}
+.dash-active-site{background:var(–surface);border:1.5px solid var(–border);border-radius:10px;padding:14px;margin-bottom:12px;border-left:4px solid var(–accent);box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.dash-active-site-label{font-size:9px;font-weight:700;color:var(–text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.dash-active-site-name{font-size:18px;font-weight:800;color:var(–text);display:flex;align-items:center;gap:8px}
+.dash-active-site-name .ldot{width:14px;height:14px;border-radius:4px}
+.dash-site-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .dash-card-title{font-size:10px;font-weight:700;color:var(–text2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
 .dash-stat{font-size:32px;font-weight:800;color:var(–accent);font-family:‘Syne’,‘Arial’,sans-serif;line-height:1.1}
 .dash-stat-sub{font-size:10px;color:var(–text2);margin-top:2px}
@@ -225,15 +231,25 @@ input[type=“date”]::-webkit-calendar-picker-indicator{filter:invert(.7) brig
 @media(max-width:768px){
 .app{height:calc(100vh - var(–hh) - 42px)}
 .btn-lbl{display:none}
+.logo{font-size:13px}
 .logo span{display:none}
+.site-switcher{display:none} /* hide site pills in header on mobile - shown in dash instead */
 .glh,.grl{width:130px;min-width:130px}
 .week-display{min-width:80px;font-size:9px}
 .dash-grid{grid-template-columns:1fr 1fr}
+.vtab{font-size:9px;padding:8px 2px 6px}
+.vtab .tab-icon{font-size:16px}
+header{padding:0 10px;gap:6px}
+.btn{padding:6px 10px}
+.btn-sm{padding:5px 8px}
+.view-tabs{overflow-x:auto;scrollbar-width:none}
+.view-tabs::-webkit-scrollbar{display:none}
 }
 @media(max-width:420px){
 .site-pill{padding:4px 9px;font-size:10px}
 .nav-weeks .week-display{display:none}
 .dash-grid{grid-template-columns:1fr}
+.vtab{min-width:65px}
 }
 
 /* ── PDF TEMPLATE ── */
@@ -995,7 +1011,13 @@ function renderDash(){
     return{...s,tc:st.length,done:sd,active:sa,overdue:so,pct};
   });
 
+  const activeSite = getActiveSite();
   wrap.innerHTML=`
+    <div class="dash-active-site">
+      <div class="dash-active-site-label">AKTIIVINEN TYÖMAA</div>
+      <div class="dash-active-site-name"><span class="ldot" style="background:${activeSite.color}"></span>${escHtml(activeSite.name)}${activeSite.code?` <span style="font-size:11px;color:var(--text2);font-weight:400">${escHtml(activeSite.code)}</span>`:''}</div>
+      ${sites.length>1?`<div class="dash-site-pills">${sites.map(s=>`<button class="site-pill${s.id===activeSiteId?' active':''}" onclick="switchSite('${escId(s.id)}')">${escHtml(s.name)}</button>`).join('')}<button class="site-pill add-site" onclick="openSiteModal()">+ Uusi</button></div>`:`<button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="openSiteModal()">+ Lisää työmaa</button>`}
+    </div>
     <div class="dash-grid">
       <div class="dash-card"><div class="dash-card-title">Tehtäviä yhteensä</div><div class="dash-stat">${totTasks}</div><div class="dash-stat-sub">${doneTasks} valmis · ${activeTasks} käynnissä</div></div>
       <div class="dash-card"><div class="dash-card-title">Henkilöstö tänään</div><div class="dash-stat">${totalPplToday}</div><div class="dash-stat-sub">työssä nyt · ${totalPplUnique} yhteensä rekisterissä</div></div>

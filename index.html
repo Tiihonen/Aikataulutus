@@ -14,6 +14,7 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap');
 :root {
@@ -305,9 +306,11 @@ header .btn-sm{padding:8px 12px;font-size:12px;font-weight:700}
 
 <header>
   <div class="logo">TYÖNJOHTAJA <span>/ pro</span></div>
+  <div id="sync-indicator" style="font-size:10px;font-family:'DM Mono',monospace;color:var(--text3);white-space:nowrap;padding:2px 6px;border-radius:4px;background:var(--surface2)">⚪ Offline</div>
   <div class="site-switcher" id="site-switcher"></div>
   <div class="header-right">
     <button class="btn btn-ghost btn-sm" onclick="openSiteModal()" title="Työmaat">⚙<span class="btn-lbl"> Työmaat</span></button>
+    <button class="btn btn-ghost btn-sm" onclick="openWorkersModal()" title="Työntekijät">👥<span class="btn-lbl"> Työntekijät</span></button>
     <button class="btn btn-ghost btn-sm" onclick="exportCSV()" title="Vie CSV">CSV<span class="btn-lbl"></span></button>
     <button class="btn btn-ghost btn-sm" onclick="exportPDF()" title="Vie PDF">PDF<span class="btn-lbl"></span></button>
     <button class="btn btn-primary" onclick="openAddTaskModal()" title="Lisää tehtävä">+<span class="btn-lbl"> Lisää</span></button>
@@ -569,8 +572,170 @@ header .btn-sm{padding:8px 12px;font-size:12px;font-weight:700}
 const COLORS=['#f5a623','#4ecdc4','#e74c6f','#45b7d1','#96e878','#c084fc','#fb923c','#38bdf8','#a3e635','#f472b6','#facc15','#34d399'];
 const SITE_COLORS=['#f5a623','#4ecdc4','#e74c6f','#7c3aed','#fb923c','#38bdf8'];
 
+// ── SUPABASE SYNC ─────────────────────────────────────────────
+const SUPABASE_URL = 'https://opzehjvgtdjhmcrxfuoo.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9wemVoanZndGRqaG1jcnhmdW9vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxODkzMzUsImV4cCI6MjA5Mzc2NTMzNX0.c3c9fukzSHH86VXdfDjJuJBJ0bg42lptWHN1pLfR4jQ';
+const TABLE_NAMES = ['sites','tasks','workers','checks','notes'];
+let supabase = null;
+let syncEnabled = false;
+let syncStatus = 'offline'; // offline | syncing | synced | error
+let pendingSyncs = new Set();
+let lastSyncedAt = null;
+
+try {
+  if(typeof window.supabase !== 'undefined' && window.supabase.createClient){
+    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    syncEnabled = true;
+  }
+} catch(e){ console.warn('Supabase init failed:', e); }
+
+function setSyncStatus(s){
+  syncStatus = s;
+  const el = document.getElementById('sync-indicator');
+  if(!el) return;
+  const map = {
+    offline: {txt:'⚪ Offline', col:'var(--text3)'},
+    syncing: {txt:'🔄 Synkronoidaan...', col:'var(--accent2)'},
+    synced:  {txt:'✓ Synkronoitu', col:'var(--accent2)'},
+    error:   {txt:'⚠ Synk-virhe', col:'var(--accent3)'}
+  };
+  const m = map[s] || map.offline;
+  el.textContent = m.txt;
+  el.style.color = m.col;
+}
+
+// Push a single record to Supabase
+async function syncPush(table, id, dataObj){
+  if(!syncEnabled) return;
+  pendingSyncs.add(table+':'+id);
+  setSyncStatus('syncing');
+  try {
+    const { error } = await supabase
+      .from(table)
+      .upsert({ id: id, data: dataObj, updated_at: new Date().toISOString() });
+    if(error) throw error;
+    pendingSyncs.delete(table+':'+id);
+    if(pendingSyncs.size === 0) setSyncStatus('synced');
+    lastSyncedAt = new Date();
+  } catch(e){
+    console.warn('Sync push failed:', e);
+    setSyncStatus('error');
+    pendingSyncs.delete(table+':'+id);
+  }
+}
+
+// Delete a record from Supabase
+async function syncDelete(table, id){
+  if(!syncEnabled) return;
+  setSyncStatus('syncing');
+  try {
+    const { error } = await supabase.from(table).delete().eq('id', id);
+    if(error) throw error;
+    setSyncStatus('synced');
+  } catch(e){
+    console.warn('Sync delete failed:', e);
+    setSyncStatus('error');
+  }
+}
+
+// Sync entire array (for bulk operations)
+async function syncPushAll(table, arr){
+  if(!syncEnabled || !arr.length) return;
+  setSyncStatus('syncing');
+  try {
+    const rows = arr.map(item => ({
+      id: item.id,
+      data: item,
+      updated_at: new Date().toISOString()
+    }));
+    const { error } = await supabase.from(table).upsert(rows);
+    if(error) throw error;
+    setSyncStatus('synced');
+  } catch(e){
+    console.warn('Bulk sync failed:', e);
+    setSyncStatus('error');
+  }
+}
+
+// Pull all data from Supabase on load
+async function syncPullAll(){
+  if(!syncEnabled) return false;
+  setSyncStatus('syncing');
+  try {
+    const results = {};
+    for(const table of TABLE_NAMES){
+      const { data, error } = await supabase.from(table).select('*').order('updated_at',{ascending:false});
+      if(error) throw error;
+      results[table] = (data || []).map(row => row.data);
+    }
+    // Replace local data ONLY if cloud has data, otherwise keep local
+    if(results.sites.length > 0) sites = results.sites;
+    if(results.tasks.length > 0) tasks = results.tasks;
+    if(results.workers.length > 0) workers = results.workers;
+    if(results.checks.length > 0) checks = results.checks;
+    if(results.notes.length > 0) notes = results.notes;
+    // Update local backup
+    saveLocal('tj_sites', sites);
+    saveLocal('tj_tasks', tasks);
+    saveLocal('tj_workers', workers);
+    saveLocal('tj_checks', checks);
+    saveLocal('tj_notes', notes);
+    setSyncStatus('synced');
+    lastSyncedAt = new Date();
+    return true;
+  } catch(e){
+    console.warn('Sync pull failed:', e);
+    setSyncStatus('error');
+    return false;
+  }
+}
+
+// Subscribe to realtime changes from other devices
+function subscribeRealtime(){
+  if(!syncEnabled) return;
+  TABLE_NAMES.forEach(table => {
+    supabase
+      .channel('public:'+table)
+      .on('postgres_changes', {event:'*', schema:'public', table:table}, payload => {
+        handleRemoteChange(table, payload);
+      })
+      .subscribe();
+  });
+}
+
+function handleRemoteChange(table, payload){
+  const localArr = {sites,tasks,workers,checks,notes}[table];
+  if(!localArr) return;
+  const ev = payload.eventType;
+  if(ev === 'DELETE'){
+    const idx = localArr.findIndex(x => x.id === payload.old.id);
+    if(idx >= 0) localArr.splice(idx, 1);
+  } else if(ev === 'INSERT' || ev === 'UPDATE'){
+    const newRow = payload.new.data;
+    const idx = localArr.findIndex(x => x.id === newRow.id);
+    if(idx >= 0) localArr[idx] = newRow;
+    else localArr.push(newRow);
+  }
+  // Save local backup and re-render
+  saveLocal('tj_'+table, localArr);
+  if(typeof renderAll === 'function') renderAll();
+}
+
 function load(k,def){try{return JSON.parse(localStorage.getItem(k))||def}catch{return def}}
-function save(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function saveLocal(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function save(k,v){
+  saveLocal(k,v);
+  // Auto-push to cloud if it's one of the synced tables
+  const tableMap = {'tj_sites':'sites','tj_tasks':'tasks','tj_workers':'workers','tj_checks':'checks','tj_notes':'notes'};
+  const table = tableMap[k];
+  if(table && syncEnabled && Array.isArray(v)){
+    syncPushAll(table, v);
+  }
+}
+// Delete from cloud helper
+async function syncDeleteId(table, id){
+  await syncDelete(table, id);
+}
 
 let sites    = load('tj_sites', []);
 let tasks    = load('tj_tasks', []);
@@ -692,12 +857,23 @@ function addSite(){
 function deleteSite(id){
   if(sites.length<=1){alert('Vähintään yksi työmaa täytyy olla.');return;}
   if(!confirm('Poista työmaa ja kaikki sen tehtävät?'))return;
+  // Capture which tasks/checks/notes will be deleted for cloud cleanup
+  const removedTaskIds = tasks.filter(t=>t.siteId===id).map(t=>t.id);
+  const removedCheckIds = checks.filter(c=>c.siteId===id).map(c=>c.id);
+  const removedNoteIds = notes.filter(n=>n.siteId===id).map(n=>n.id);
   sites=sites.filter(s=>s.id!==id);
   tasks=tasks.filter(t=>t.siteId!==id);
   checks=checks.filter(c=>c.siteId!==id);
   notes=notes.filter(n=>n.siteId!==id);
   save('tj_sites',sites); save('tj_tasks',tasks); save('tj_checks',checks); save('tj_notes',notes);
-  if(activeSiteId===id){activeSiteId=sites[0].id;save('tj_active_site',activeSiteId);}
+  // Cloud deletions
+  if(syncEnabled){
+    syncDelete('sites', id);
+    removedTaskIds.forEach(tid => syncDelete('tasks', tid));
+    removedCheckIds.forEach(cid => syncDelete('checks', cid));
+    removedNoteIds.forEach(nid => syncDelete('notes', nid));
+  }
+  if(activeSiteId===id){activeSiteId=sites[0].id;saveLocal('tj_active_site',activeSiteId);}
   renderSiteList(); renderSiteSwitcher(); populateSiteSelects();
 }
 function editSite(id){
@@ -770,8 +946,11 @@ function saveTask(){
 }
 function deleteTask(){
   if(!confirm('Poistetaanko tehtävä?'))return;
+  const removedId = editingTaskId;
   tasks=tasks.filter(t=>t.id!==editingTaskId);
-  save('tj_tasks',tasks); closeTaskModal(); renderAll();
+  save('tj_tasks',tasks);
+  if(syncEnabled) syncDelete('tasks', removedId);
+  closeTaskModal(); renderAll();
 }
 
 // ── CHECK MODAL ────────────────────────────────────────────────
@@ -805,8 +984,11 @@ function saveCheckItem(){
 }
 function deleteCheckItem(){
   if(!confirm('Poistetaanko?'))return;
+  const removedId = editingCheckId;
   checks=checks.filter(c=>c.id!==editingCheckId);
-  save('tj_checks',checks); closeCheckModal(); renderCheckView();
+  save('tj_checks',checks);
+  if(syncEnabled) syncDelete('checks', removedId);
+  closeCheckModal(); renderCheckView();
 }
 function toggleCheck(id){
   const c=checks.find(x=>x.id===id); if(!c)return;
@@ -841,8 +1023,11 @@ function saveNote(){
 }
 function deleteNote(){
   if(!confirm('Poistetaanko muistiinpano?'))return;
+  const removedId = editingNoteId;
   notes=notes.filter(n=>n.id!==editingNoteId);
-  save('tj_notes',notes); closeNoteModal(); renderNotesView();
+  save('tj_notes',notes);
+  if(syncEnabled) syncDelete('notes', removedId);
+  closeNoteModal(); renderNotesView();
 }
 
 // ── WORKERS MANAGEMENT ─────────────────────────────────────────
@@ -919,6 +1104,7 @@ function deleteWorker(id){
     if(t.workerIds) t.workerIds=t.workerIds.filter(wid=>wid!==id);
   });
   save('tj_workers',workers); save('tj_tasks',tasks);
+  if(syncEnabled) syncDelete('workers', id);
   renderWorkersList(); renderAll();
 }
 
@@ -1037,9 +1223,31 @@ function renderDash(){
     </div>
     <div class="dash-grid">
       <div class="dash-card"><div class="dash-card-title">Tehtäviä yhteensä</div><div class="dash-stat">${totTasks}</div><div class="dash-stat-sub">${doneTasks} valmis · ${activeTasks} käynnissä</div></div>
-      <div class="dash-card"><div class="dash-card-title">Henkilöstö tänään</div><div class="dash-stat">${totalPplToday}</div><div class="dash-stat-sub">työssä nyt · ${totalPplUnique} yhteensä rekisterissä</div></div>
+      <div class="dash-card" style="cursor:pointer" onclick="openWorkersModal()" title="Avaa työntekijärekisteri"><div class="dash-card-title">Henkilöstö tänään  <span style="float:right;color:var(--accent2);font-size:11px">→ Hallitse</span></div><div class="dash-stat">${totalPplToday}</div><div class="dash-stat-sub">työssä nyt · ${totalPplUnique} yhteensä rekisterissä</div></div>
       <div class="dash-card"><div class="dash-card-title" style="color:var(--accent3)">Myöhässä</div><div class="dash-stat" style="color:${overdueTasks>0?'var(--accent3)':'var(--accent2)'}">${overdueTasks}</div><div class="dash-stat-sub">tehtävää ylittänyt deadlinen</div></div>
       <div class="dash-card"><div class="dash-card-title">Tarkistuslista</div><div class="dash-stat" style="color:var(--accent2)">${doneChecks}/${totalChecks}</div><div class="dash-stat-sub">kohtaa tarkistettu</div></div>
+    </div>
+
+    <div class="dash-card" style="margin-bottom:10px">
+      <div class="dash-card-title" style="display:flex;justify-content:space-between;align-items:center">
+        <span>Työntekijät — rekisteri</span>
+        <button class="btn btn-teal btn-sm" onclick="openWorkersModal()" style="font-size:9px;padding:4px 8px">+ Hallinnoi</button>
+      </div>
+      ${workers.length===0?`<div style="text-align:center;padding:14px 8px;color:var(--text3);font-size:12px">
+        Ei työntekijöitä rekisterissä. <button class="btn btn-teal btn-sm" onclick="openWorkersModal()" style="margin-top:8px">+ Lisää ensimmäinen työntekijä</button>
+      </div>`:`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:6px">
+        ${workers.slice(0,12).map(w=>{
+          const tc=tasks.filter(t=>(t.workerIds||[]).includes(w.id)).length;
+          const td=new Date().toISOString().split('T')[0];
+          const activeNow=tasks.filter(t=>(t.workerIds||[]).includes(w.id)&&t.start<=td&&t.end>=td).length;
+          return`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:8px 10px">
+            <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(w.name)}</div>
+            ${w.role?`<div style="font-size:10px;color:var(--text2);font-family:'DM Mono',monospace">${escHtml(w.role)}</div>`:''}
+            <div style="font-size:9px;color:${activeNow?'var(--accent2)':'var(--text3)'};font-family:'DM Mono',monospace;font-weight:700;margin-top:3px">${tc} tehtävää${activeNow?` · ${activeNow} käynnissä`:''}</div>
+          </div>`;
+        }).join('')}
+        ${workers.length>12?`<div style="background:var(--surface2);border:1px dashed var(--border);border-radius:6px;padding:8px 10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);font-size:11px;font-weight:600" onclick="openWorkersModal()">+${workers.length-12} muuta</div>`:''}
+      </div>`}
     </div>
 
     <div class="dash-card" style="margin-bottom:10px">
@@ -1529,6 +1737,31 @@ function renderAll(){
 
 renderAll();
 renderDash(); // always pre-render dash
+
+// ── SUPABASE SYNC INIT ─────────────────────────────────────────
+(async function initSync(){
+  if(!syncEnabled){
+    setSyncStatus('offline');
+    return;
+  }
+  setSyncStatus('syncing');
+  // Pull data from cloud
+  const ok = await syncPullAll();
+  if(ok){
+    // Re-render with cloud data
+    renderAll();
+    renderDash();
+    // Push any local-only data up too (in case local has newer items)
+    if(sites.length) await syncPushAll('sites', sites);
+    if(workers.length) await syncPushAll('workers', workers);
+    if(tasks.length) await syncPushAll('tasks', tasks);
+    if(checks.length) await syncPushAll('checks', checks);
+    if(notes.length) await syncPushAll('notes', notes);
+    // Subscribe to realtime updates
+    subscribeRealtime();
+    setSyncStatus('synced');
+  }
+})();
 
 // ── PWA SERVICE WORKER ─────────────────────────────────────────
 if('serviceWorker' in navigator){

@@ -761,7 +761,10 @@ const WPX=70;
 let currentView='dash';
 
 // ── SITE UTILS ─────────────────────────────────────────────────
-function getActiveSite(){return sites.find(s=>s.id===activeSiteId)||sites[0]}
+function getActiveSite(){
+  if(!sites.length) return {id:'',name:'(Ei työmaata)',color:'#888',addr:'',code:'',mgr:'',designer:'',company:''};
+  return sites.find(s=>s.id===activeSiteId) || sites[0];
+}
 function siteTasks(sid){
   const id=sid||(activeSiteId||'');
   if(!id) return [];
@@ -1739,27 +1742,44 @@ renderAll();
 renderDash(); // always pre-render dash
 
 // ── SUPABASE SYNC INIT ─────────────────────────────────────────
+// CRITICAL: Sync runs in background and NEVER blocks the UI.
+// Local data is shown immediately, cloud sync happens after.
 (async function initSync(){
   if(!syncEnabled){
     setSyncStatus('offline');
     return;
   }
-  setSyncStatus('syncing');
-  // Pull data from cloud
-  const ok = await syncPullAll();
-  if(ok){
-    // Re-render with cloud data
-    renderAll();
-    renderDash();
-    // Push any local-only data up too (in case local has newer items)
-    if(sites.length) await syncPushAll('sites', sites);
-    if(workers.length) await syncPushAll('workers', workers);
-    if(tasks.length) await syncPushAll('tasks', tasks);
-    if(checks.length) await syncPushAll('checks', checks);
-    if(notes.length) await syncPushAll('notes', notes);
-    // Subscribe to realtime updates
-    subscribeRealtime();
-    setSyncStatus('synced');
+  try {
+    setSyncStatus('syncing');
+
+    // Add timeout - if cloud doesn't respond in 8 seconds, give up
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Sync timeout')), 8000)
+    );
+
+    const ok = await Promise.race([syncPullAll(), timeoutPromise]);
+
+    if(ok){
+      // Re-render with cloud data
+      renderAll();
+      renderDash();
+      // Push any local-only data up too (in case local has newer items)
+      if(sites.length) syncPushAll('sites', sites).catch(()=>{});
+      if(workers.length) syncPushAll('workers', workers).catch(()=>{});
+      if(tasks.length) syncPushAll('tasks', tasks).catch(()=>{});
+      if(checks.length) syncPushAll('checks', checks).catch(()=>{});
+      if(notes.length) syncPushAll('notes', notes).catch(()=>{});
+      // Subscribe to realtime updates
+      try { subscribeRealtime(); } catch(e){ console.warn('Realtime subscribe failed:', e); }
+      setSyncStatus('synced');
+    } else {
+      setSyncStatus('error');
+    }
+  } catch(err){
+    console.warn('Sync init error:', err);
+    setSyncStatus('error');
+    // Make sure UI is rendered even if sync fails
+    try { renderAll(); renderDash(); } catch(e){}
   }
 })();
 
